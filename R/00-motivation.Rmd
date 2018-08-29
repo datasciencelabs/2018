@@ -1,0 +1,27 @@
+# Introduction to R
+
+In this book we will be using the
+[R software environment](https://cran.r-project.org/) for all our
+analysis. Throughout the book you will learn R and data analysis techniques simultaneously. However, we need to introduce basic R syntax to get you going. In this chapter, rather than cover every R skill you need, we introduce just enough so that you can follow along the remaining chapters where we provide more in depth coverage, building upon what you learn in this chapter. We find that we better retain R knowledge when we learn it to solve a specific problem.
+
+In this chapter, as done throughout the book, we will use a motivating case study. We ask a specific question related to crime in United States and provide a relevant dataset. Some basic R skills will permit us to answer the motivating question. 
+
+
+## US gun murders
+
+Imagine you live in Europe and are offered a job in a US company with many locations across all states. It is a great job but news with headlines such as [**US Gun Homicide Rate Higher Than Other Developed Countries**](http://abcnews.go.com/blogs/headlines/2012/12/us-gun-ownership-homicide-rate-higher-than-other-developed-countries/) have you worried. Charts like this make you worry even more:
+
+![US gun homicides chart](http://abcnews.go.com/images/International/homocides_g8_countries_640x360_wmain.jpg)
+
+Or even worse, this version from [everytown.org](https://everytownresearch.org/us-gun-violence-trends/):
+
+![US gun homicides second chart](https://everytownresearch.org/wp-content/uploads/2016/07/GunTrends_murders_per_1000.png)
+
+But then you are reminded that the US is a large and diverse country with 50 very different states as well as the District of Columbia (DC). 
+ 
+<!-- Picture of US states --> 
+
+California, for example, has a larger population than Canada and 20 US states have populations larger than that of Norway's. In some respects the variability across states in the US is akin to the variability across countries in Europe. Furthermore, although not in the charts above, the murder rates in Lithuania, Ukraine, and Russia are higher than 4 per 100,000. So perhaps the news reports that worried you are too superficial. You have options of where to live and want to find out how safe each state is. We will gain some insights by examining data related to gun homicides in the US using R. 
+
+Now before we get started with our example, we need to cover logistics as well as some of the very basic building blocks that we need to gain more advanced R skills. Be aware that for some of these, it is not immediately obvious how it is useful, but later in the book you will appreciate having the knowledge under your belt.
+
