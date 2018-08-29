@@ -5,7 +5,7 @@ output:
   html_document: default
 ---
   
-Starting with homework 1, we will be using a specific tool to submit homework assignments, other than Canvas. The tool we will be using is called git and GitHub. This is a tutorial that will help you install the tool git on your computer and create a GitHub account. 
+Starting with homework 1, we will be using a specific tool to submit homework assignments other than Canvas. The tool we will be using is called git and GitHub. This is a tutorial that will help you install the tool git on your computer and create a GitHub account. 
  
   
 ## Create your GitHub account
@@ -14,7 +14,7 @@ Starting with homework 1, we will be using a specific tool to submit homework as
   and submit your GitHub username in a survey. 
   
   To sign up for an account, just go to [github](https://github.com) 
-  and pick a unique username, an email address, and a password. 
+  and pick a unique username and supply an email address and a password. 
   Once you've done that, your github page will be at 
   `https://github.com/<your-username-here>`.
   
@@ -104,10 +104,10 @@ Starting with homework 1, we will be using a specific tool to submit homework as
   
   As mentioned earlier, if you ever installed Xcode or the 
   "Command Line Developer tools", you may already have git.
-  Make sure its version 2.0 or higher. (`git --version`)
+  Make sure it's version 2.0 or higher. (`git --version`)
   
   Or if you use **Homebrew**, you can install it from there. 
-  The current version on homebrew is 2.4.3
+  The current version on homebrew is 2.11.0
   You don't need to do anything more in this section.
   
   -----
