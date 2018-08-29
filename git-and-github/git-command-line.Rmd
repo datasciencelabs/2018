@@ -5,9 +5,9 @@ output:
   html_document: default
 ---
 
-We will be using  git and GitHub to get your homework assignments, work on your homework, 
+You will be using git and GitHub to get your homework assignments, work on your homework, 
 and submit your homework solutions. This tutorial will walk you through 
-that process using git and GitHub through the command line(see the other [tutorial](https://github.com/datasciencelabs/2017/blob/master/lectures/git-and-github/git-rstudio.Rmd) for using git and GitHub with RStudio). 
+that process using git and GitHub through the command line (see the other [tutorial](https://github.com/datasciencelabs/2017/blob/master/lectures/git-and-github/git-rstudio.Rmd) for using git and GitHub with RStudio). 
 
 ## Getting and Working on Homework
 
@@ -30,7 +30,7 @@ see what is in store. The work flow will be pretty simple.
 1. Go to: https://github.com/datasciencelabs-students
 
 2. Click on the repository you want to work on. For 
-example `<your_GitHub_username>-2017HW1` for Homework 1. 
+example `<your_GitHub_username>-2018HW1` for Homework 1. 
 
 3. Copy the link near the top of the page that is revealed after clicking 'clone or download'.
 
@@ -45,7 +45,7 @@ change directories into your BST260 folder.
 
 <center><img src="./images/mkdir-clone.png" alt="gitclean" style="width: 600px;"/></center>
 
-6. You should now see a new directory called `<your_GitHub_username>-2017HW1`. 
+6. You should now see a new directory called `<your_GitHub_username>-2018HW1`. 
 Move into that directory with `cd` (shown in the last line of the previous image). 
 
 7. If you type `git status` it will give you the current status of your 
@@ -58,8 +58,8 @@ directory. It should look something like this:
 
 Once you have a local copy of your repository, it's time to get to work! 
 
-After writing some of your homework in an `Rmd` file, and `knit` it, 
-make pretty plots, find out some cool stuff about the dataset it's 
+After writing some of your homework in an `Rmd` file, `knit` it, 
+make pretty plots, and find out some cool stuff about the dataset, it's 
 time to `add/commit/push`. After some work, if you head back to `Terminal` 
 you will see that something has changed when you type `git status`:
 
@@ -69,24 +69,24 @@ You will notice that there is one `untracked file`.
 In order to get git to track changes in this file we need to 
 add it. So we type :
 
-> `$ git add HW2_Problems.html `
+> `$ git add HW1_Problems.html `
 
 We also need to add the .Rmd file in order to `stage` it (so that it
 will be included in the next commit). So we type :
 
-> `$ git add HW2_Problems.Rmd `
+> `$ git add HW1_Problems.Rmd `
 
  <center><img src="./images/gitstaged.png" alt="gitclean" style="width: 700px;"/></center>
 
 Now you will notice that the files have turned green and are now 
-labeled as changes to be committed, now it's time to commit. 
+labeled as changes to be committed. Now it's time to commit. 
 This is equivalent to `save` in most programs. But what is special 
 about `git` and other version control software is that we can track 
 and revert changes! We also need to give what's called a `commit message`, 
 which will help us keep track of the changes we made when we look at 
 this in the future. Leave detailed messages so that future you will 
 know what you did. Future you will thank you. We will get to this 
-part later. Notice the `-am` flag, the `a` stands for *all*, 
+part later. Notice the `-am` flag. The `a` stands for *all*, 
 as in all tracked files, and the `m` stands for *message*.
 
 We do that by typing:
@@ -121,7 +121,7 @@ Generally keep this picture in mind whenever you want to do this
 loop, it is important to only add changed files you care about 
 and nothing you do not care about. If certain files keep popping 
 up in your git status that you will never want to add, e.g. `.Rhistory`, 
-etc, add them to your `.gitignore` to simplify your life, this will keep 
+etc, add them to your `.gitignore` to simplify your life. This will keep 
 those files from showing up here. For more info on this see the 
 `version_control.Rmd`
 
@@ -135,8 +135,8 @@ From the course web-page:
 > Each student is given six late days for homework at the beginning of the semester. A late day extends the individual homework deadline by 24 hours without penalty. No more than two late days may be used on any one assignment. Assignments handed in more than 48 hours after the original deadline will not be graded. We do not accept any homework under any circumstances more than 48 hours after the original deadline. Late days are intended to give you flexibility: you can use them for any reason no questions asked. You don't get any bonus points for not using your late days. Also, you can only use late days for the individual homework deadlines all other deadlines (e.g., project milestones) are hard.
 
 We made this policy because we understand that you are all busy 
-and things happen. We hope that this added flexibility makes gives you 
-the freedom to enjoy the courses and engage with the material fully. 
+and things happen. We hope that this added flexibility gives you 
+the freedom to enjoy the course and engage with the material fully. 
 
 ## Some unsolicited advice
 
@@ -151,12 +151,10 @@ the last `commit` as your final submission.
 "I forgot to `push`" is not an acceptable excuse for late work.
 3. It may help to add a message like "This is my final version of the 
 homework please grade this" but that's up to you.
-4. If there are `commit`s after the deadline **we will take the last `commit`**
-up to Sunday at 11:59 pm as the final version. 
-5. We will assess the number of late days you used and keep track.
-6. You **do not** need to tell us that you will take extra days, we will 
+4. We will assess the number of late days you used and keep track.
+5. You **do not** need to tell us that you will take extra days, we will 
 be able to see the time stamp of your last `commit`.
-7. When you are done with the homework, do not `commit` or `push` any more. 
+6. When you are done with the homework, do not `commit` or `push` any more. 
 If you `commit` and `push` after the deadline you will be charged a late day. 
 This is strict.
 
