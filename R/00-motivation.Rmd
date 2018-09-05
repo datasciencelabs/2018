@@ -9,11 +9,11 @@ In this section, as done throughout the course, we will use a motivating case st
 
 ## US gun murders
 
-Imagine you live in Europe and are offered a job at a US company with many locations across all states. It is a great job but news with headlines such as [**US Gun Homicide Rate Higher Than Other Developed Countries**](http://abcnews.go.com/blogs/headlines/2012/12/us-gun-ownership-homicide-rate-higher-than-other-developed-countries/) have you worried. Charts like this make you worry even more:
+Imagine you live in Europe and are offered a job at a US company with many locations across all states. It is a great job but news with headlines such as [**US Gun Homicide Rate Higher Than Other Developed Countries**](https://abcnews.go.com/News/us-gun-ownership-homicide-rate-higher-than-other-developed-countries/blogEntry?id=18008187) have you worried. Charts like this make you worry even more:
 
 ![US gun homicides chart](http://abcnews.go.com/images/International/homocides_g8_countries_640x360_wmain.jpg)
 
-Or even worse, this version from [everytown.org](https://everytownresearch.org/us-gun-violence-trends/):
+Or even worse, this version from [everytown.org](https://everytownresearch.org/gun-violence-america/):
 
 ![US gun homicides second chart](https://everytownresearch.org/wp-content/uploads/2016/07/GunTrends_murders_per_1000.png)
 
