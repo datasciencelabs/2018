@@ -40,7 +40,7 @@ This tells us much more about the object. We see that the table has 51 rows (50 
 head(murders)
 ```
 
-In this data set each state is considered an obsrvation and five varialbles reported for each state.
+In this dataset each state is considered an obsrvation and five variables are reported for each state.
 
 Before we go any further in answering our original question about different states, let's get to know the components of this object better.
 
@@ -58,13 +58,13 @@ But how did we know to use `population`? Above, by applying the function `str` t
 names(murders)
 ```
 
-It is important to know that the order of the entries in `murders$population` preserve the order of the rows in our data table. This will later permit us to manipulate one variable based on the results of another, for example we will be able to order the state names by number of murders.
+It is important to know that the order of the entries in `murders$population` preserve the order of the rows in our data table. This will later permit us to manipulate one variable based on the results of another. For example, we will be able to order the state names by number of murders.
 
-**Tip**: R comes with a very nice auto-complete functionality that saves us the trouble of typing out all the name. Try typing `murders$p` then hitting the _tab_ key on your keyboard. RStudio has many useful auto-complete features options.
+**Tip**: R comes with a very nice auto-complete functionality that saves us the trouble of typing out all the names. Try typing `murders$p` then hitting the _tab_ key on your keyboard. RStudio has many useful auto-complete features options.
 
 ### Vectors: numerics, characters, and logical
 
-Note that the object  `murders$population` is not one number but several. We call these types of objects _vectors_. A single number is technically a vector but in general we vectors refer to objects with several entries. The function `length` tells you how many entries in the vector:
+Note that the object  `murders$population` is not one number but several. We call these types of objects _vectors_. A single number is technically a vector but in general vectors refer to objects with several entries. The function `length` tells you how many entries are in the vector:
 
 ```{r}
 pop <- murders$population
@@ -78,7 +78,7 @@ class(pop)
 ```
 In a numeric vector, every entry must be a number. 
 
-To store character strings, vectors can also be of class _character_. For example the state names are characters:
+To store character strings, vectors can also be of class _character_. For example, the state names are characters:
 
 ```{r}
 class(murders$state)
@@ -94,7 +94,7 @@ z
 class(z)
 ```
 
-Here the `==` is a relational operator asking if 3 is equals to 2. Remember that in R, if you just use one `=` you actually assign. You can see the other _relational operators_ by typing
+Here the `==` is a relational operator asking if 3 is equal to 2. Remember that in R, if you just use one `=` you actually assign. You can see the other _relational operators_ by typing
 
 ```{r, eval=FALSE}
 ?Comparison
@@ -103,12 +103,12 @@ Here the `==` is a relational operator asking if 3 is equals to 2. Remember that
 In future sections you will see how useful relational operators can be.
 
 
-**Advanced**: Mathematically, the values in `pop` are integers and there is an integer class in R. However, by default, numbers are assigned class numeric even when they are round integers, for example `class(1)` returns numeric. You can turn them into class integer with `as.integer(1)` or add by adding an `L` like this: `1L`. Note the class by typing: `class(1L)`
+**Advanced**: Mathematically, the values in `pop` are integers and there is an integer class in R. However, by default, numbers are assigned class numeric even when they are round integers, for example `class(1)` returns numeric. You can turn them into class integer with `as.integer(1)` or by adding an `L` like this: `1L`. Note the class by typing: `class(1L)`.
 
 
 ### Factors
 
-In the `murders` dataset we might expect the region to also be a character vector. However it is not:
+In the `murders` dataset we might expect the region to also be a character vector. However, it is not:
 
 ```{r}
 class(murders$region)
@@ -121,13 +121,13 @@ it is a _factor_. Factors are useful for storing categorical data. Notice that t
 levels(murders$region)
 ```
 
-So, in the background, R stores these _levels_ as integers and keeps a map to keep track of the labels. This is more memory efficient than storing all the characters. However, factors are also a source of confusion as they can easily be confused with characters but behave differently in different context. We will see more of this later. 
+So, in the background, R stores these _levels_ as integers and keeps a map to keep track of the labels. This is more memory efficient than storing all the characters. However, factors are also a source of confusion as they can easily be confused with characters but behave differently in different contexts. We will see more of this later. 
 
-In general, we recommend avoiding factors as much as possible although they are sometimes necessary to fit model containing categorical data.
+In general, we recommend avoiding factors as much as possible although they are sometimes necessary to fit models containing categorical data.
  
 ### Lists
 
-Data frames are a special case of _lists_. We will covers lists in more detail later but know that they are useful because you can store any combination of other types, here is an example of list we created for you:
+Data frames are a special case of _lists_. We will covers lists in more detail later but know that they are useful because you can store any combination of other types. Here is an example of a list we created for you:
 
 
 ```{r, echo=FALSE}
