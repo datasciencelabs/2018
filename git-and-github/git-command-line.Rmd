@@ -1,13 +1,13 @@
 ---
 title: "Homework with Git and GitHub Using the Command Line"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 You will be using git and GitHub to get your homework assignments, work on your homework, 
 and submit your homework solutions. This tutorial will walk you through 
-that process using git and GitHub through the command line (see the other [tutorial](https://github.com/datasciencelabs/2017/blob/master/lectures/git-and-github/git-rstudio.Rmd) for using git and GitHub with RStudio). 
+that process using git and GitHub through the command line (see the other [tutorial](https://github.com/datasciencelabs/2018/blob/master/git-and-github/git-rstudio.Rmd) for using git and GitHub with RStudio). 
 
 ## Getting and Working on Homework
 
@@ -41,7 +41,7 @@ change directories into your BST260 folder.
 
 5. Use `git clone` to clone the repository using the link from step 3. For example:
 
-> `$ git clone https://github.com/datasciencelabs-students/<your_GitHub_username>-2017HW1.git`
+> `$ git clone https://github.com/datasciencelabs-students/<your_GitHub_username>-2018HW1.git`
 
 <center><img src="./images/mkdir-clone.png" alt="gitclean" style="width: 600px;"/></center>
 
@@ -69,12 +69,12 @@ You will notice that there is one `untracked file`.
 In order to get git to track changes in this file we need to 
 add it. So we type :
 
-> `$ git add HW1_Problems.html `
+> `$ git add hw-1-us-murders.html `
 
 We also need to add the .Rmd file in order to `stage` it (so that it
 will be included in the next commit). So we type :
 
-> `$ git add HW1_Problems.Rmd `
+> `$ git add hw-1-us-murders.Rmd `
 
  <center><img src="./images/gitstaged.png" alt="gitclean" style="width: 700px;"/></center>
 

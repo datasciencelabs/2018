@@ -1,8 +1,8 @@
 ---
 title: "Setting up Git and GitHub"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
   
 Starting with homework 1, we will be using a specific tool to submit homework assignments other than Canvas. The tool we will be using is called git and GitHub. This is a tutorial that will help you install the tool git on your computer and create a GitHub account. 
