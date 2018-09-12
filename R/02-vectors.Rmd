@@ -1,0 +1,170 @@
+## Vectors
+
+The most basic unit available in R to store data are _vectors_. Complex datasets can usually be broken down into components that are vectors. For example in a data frame, each column is a vector. Here we learn more about this important class.
+
+### Creating vectors
+
+We can create vectors using the function `c`, which stands for concatenate. We use `c` to _concatenate_ entires in the following way:
+
+```{r}
+codes <- c(380, 124, 818)
+codes
+```
+
+We can also create character vectors. We use the quotes to denote that the entries are characters rather than variables names.
+
+```{r}
+country <- c("italy","canada","egypt")
+```
+
+By now you should know that if you type
+
+```{r, eval=FALSE}
+country <- c(italy, canada, egypt)
+```
+you recieve an error becuase the variables `italy`, `canada` and `egypt` are not defined: R looks for variables with those names and returns an error.
+
+### Names
+
+Sometimes it is useful to name the entries of a vector. For example, when defining a vector of country codes we can use the names to connect the two:
+
+```{r}
+codes <- c(italy = 380, canada = 124, egypt = 818)
+codes
+```
+
+The object `codes` continues to be a numeric vector:
+```{r}
+class(codes)
+```
+but with names
+```{r}
+names(codes)
+```
+
+If the use of strings without quotes looks confusing, know that you can use the quotes as well
+
+```{r}
+codes <- c("italy" = 380, "canada" = 124, "egypt" = 818)
+codes
+```
+
+There is no difference between this call and the previous one: one of the many ways R is quirky compared to other languages.
+
+We can also assign names using the `names` functions
+
+```{r}
+codes <- c(380, 124, 818)
+country <- c("italy","canada","egypt")
+names(codes) <- country
+codes
+```
+
+### Sequences
+
+Another useful function for creating vectors generates sequences
+
+```{r}
+seq(1, 10)
+```
+
+The first argument defines the start, and the second the end. The default is to go up in increments of 1, but a third argument let's us tell it how much to jump by:
+
+```{r}
+seq(1, 10, 2)
+```
+
+If we want consecutive integers we can use the following shorthand
+
+```{r}
+1:10
+```
+
+Note that when we use this function, R produces integers, not numerics, because they are typically used to index something:
+
+```{r}
+class(1:10)
+```
+
+However, note that as soon as we create something it's not an integer the class changes:
+
+```{r}
+class(seq(1, 10))
+class(seq(1, 10, 0.5))
+```
+
+### Subsetting
+
+We use square brackets to access specific elements of a list. For the vector `codes` we defined above, we can access the second element using
+```{r}
+codes[2]
+```
+
+You can get more than one entry by using a multi-entry vector as an index:
+```{r}
+codes[c(1,3)]
+```
+
+The sequences defined above are particularly useful if we want to access, say, the first two elements
+
+```{r}
+codes[1:2]
+```
+
+If the elements have names, we can also access the entries using these names. Here are two examples
+
+```{r}
+codes["canada"]
+codes[c("egypt","italy")]
+```
+
+### Coercion
+
+In general, _coercion_ is an attempt by R to be flexible with data types. When an entry does not match the expected, R tries to guess what we meant before throwing an error. This can also lead to confusion. Failing to understand _coercion_ can drive a programmer crazy when attempting to code in R since it behaves quite diffently from most other languages in this regard. Let's learn about it with some examples.
+
+We said that elements of a vector must be all of the same type. So if we try to combine, say, numbers and characters you might expect an error
+
+```{r}
+x <- c(1, "canada", 3)
+```
+
+But we don't get one, not even a warning! What happened? Look at `x` and its class:
+
+```{r}
+x
+class(x)
+```
+
+R _coerced_ the data into characters. It guessed that because you put a character string in the vector you meant the 1 and 3 to actually be character strings `"1"` and "`3`". The fact  that not even a warning is issued is an example of how coercion can cause many unnoticed errors in R. 
+
+R also offers functions to force a specific coercion. For example you can turn numbers into characters with 
+
+```{r}
+x <- 1:5
+y <- as.character(x)
+y
+```
+
+And you can turn it back with `as.numeric`. 
+
+```{r}
+as.numeric(y)
+```
+ 
+This function is actually quite useful as datasets that include numbers as character strings are common. 
+
+### Not Availables (NA)
+
+When these coercion functions encounter an impossible case it gives us a warning and turns the entry into an special value called an `NA` for "not available".  For example:
+
+```{r}
+x <- c("1", "b", "3")
+as.numeric(x)
+```
+
+R does not have any guesses for what number you want when you type `b` so it does not try.
+
+Note that as a data scientist you will encounter the `NA` often as they are  used for missing data, a common problem in real life datasets.
+
+
+
