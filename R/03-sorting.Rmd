@@ -1,0 +1,93 @@
+## Sorting
+
+Now that we have some basic R knowledge under our belt, let's try to gain some insights into the safety of different states in the context of gun murders. 
+
+### `sort` 
+
+We want to rank the states from least to most gun murders. The function `sort` sorts a vector in increasing order. So we can see the number of gun murders by typing 
+
+```{r}
+library(dslabs)
+data(murders)
+sort(murders$total)
+```
+
+However, this does not give us information about which states have which murder totals. For example, we don't know which state had `r max(murders$total)` murders in 2010. 
+
+### `order`
+
+The function `order` is closer to what we want. It takes a vector and returns the vector of indexes that sort the input vector. This may sound confusing so let's look at a simple example: we create a vector and sort it:
+
+```{r}
+x <- c(31, 4, 15, 92, 65)
+sort(x)
+```
+
+Rather than sort the vector, the function `order` gives us back the index that, if used to index the vector, will sort it:
+
+```{r}
+index <- order(x)
+x[index]
+```
+
+If we look at this index we see why it works:
+```{r}
+x
+order(x)
+```
+
+Note that the second entry of `x` is the smallest so `order(x)` starts with `2`. The next smallest is the third entry so the second entry is `3` and so on. 
+
+How does this help us order the states by murders? First remember that the entries of vectors you access with `$` follow the same order as the rows in the table. So, for example, these two vectors, containing the state names and abbreviations respectively, are matched by their order:
+
+```{r}
+murders$state[1:10]
+murders$abb[1:10]
+```
+
+So this means we can now order the state names by their total murders by first obtaining the index that orders the vectors according to murder totals, and the indexing the state names or abbreviation vector:
+
+```{r}
+ind <- order(murders$total) 
+murders$abb[ind] 
+```
+
+We see that California had the most murders.
+
+### `max` and `which.max`
+
+If we are only interested in the entry with the largest value we can use `max` for the value
+
+```{r}
+max(murders$total)
+```
+
+and `which.max` for the index of the largest value
+
+```{r}
+i_max <- which.max(murders$total)
+murders$state[i_max]
+```
+
+For the minimum we can use `min` and `which.min` in the same way.
+
+So is California the most dangerous state? In a next section we argue that we should be considering rates not totals. Before doing that we introduce one last order related function: `rank`
+
+### `rank`
+
+Although less useful than `order` and `sort`, the function `rank` is also related to order.
+For any given list it gives you a vector with the rank of the first entry, second entry, etc...  of the vector. Here is a simple example
+
+```{r}
+x <- c(31, 4, 15, 92, 65)
+rank(x)
+```
+
+To summarize let's look at the results of the three functions we have introduced
+
+```{r, echo=FALSE}
+knitr::kable(data.frame(original=x, sort=sort(x), order=order(x), rank=rank(x)))
+
+```
+
+

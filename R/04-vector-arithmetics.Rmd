@@ -1,0 +1,79 @@
+## Vector arithmetic
+
+```{r}
+library(dslabs)
+data(murders)
+```
+
+California had the most murders. But does this mean it is the most dangerous state? What if it just has many more people than any other state? We can very quickly confirm that, indeed, California has the largest population:
+
+```{r}
+murders$state[which.max(murders$population)]
+```
+
+with over `r floor(max(murders$population)/10^6)` million inhabitants! It is therefore unfair to compare the totals if we are interested in learning how safe the state is.
+
+What we really should be computing is the murders per capita. The reports we describe in the motivating section used murders per 100,000 as the unit. To compute this quantiy, the powerful vector arithmetic capabilities of R come in handy.
+
+### Rescaling
+
+In R, arithmetic operations on vectors occur _element wise_. For a quick example suppose we have height in inches
+
+```{r}
+heights <- c(69, 62, 66, 70, 70, 73, 67, 73, 67, 70)
+```
+and want to covert to centimeters. Note what happens when we multiply `heights` by 2.54:
+
+```{r}
+heights * 2.54
+```
+
+it multiplied each element by 2.54.  Similarly if we want to compute how many inches taller or shorter than the average, 69 inches, we can subtract it from every entry like this
+
+```{r}
+heights - 69
+```
+
+
+### Two vectors
+
+If we have two vectors of the same length, and we sum them in R, they get added entry by entry like this
+
+$$
+\begin{pmatrix}
+a\\
+b\\
+c\\
+d
+\end{pmatrix}
++
+\begin{pmatrix}
+e\\
+f\\
+g\\
+h
+\end{pmatrix}
+=
+\begin{pmatrix}
+a +e\\
+b + f\\
+c + g\\
+d + h
+\end{pmatrix}
+$$
+
+The same holds for other mathematical operation such as `-`, `*` and `/`.
+
+This implies that to compute the murder rates we can simply type
+
+```{r}
+murder_rate <- murders$total / murders$population * 100000
+```
+
+Once we do this, we notice that California is no longer near the top of the list. In fact, we can use what we have learned to order the states by murder rate:
+
+```{r}
+murders$state[order(murder_rate)]
+```
+
+
