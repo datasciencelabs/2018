@@ -95,7 +95,7 @@ us_murder_rate
 
 This computation counts larger states proportionally to their size and this results in a larger value.
 
-### Using the dot to access the pipped data 
+### Using the dot to access the piped data 
 
 The `us_murder_rate` object defined above represents just one number. Yet we are storing it in a data frame
 
