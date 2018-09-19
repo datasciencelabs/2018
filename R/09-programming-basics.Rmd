@@ -226,7 +226,7 @@ It turns out that we rarely use for loops in R. This is because there are usuall
     Write a line of code that assigns to the object `new_names` the state abbreviation when the state name is longer than 8 characters.
     
 
-4. Create a function `sum_n`that for any given value, say $n$, computes the sum of the integers from 1 to n (inclusive). Use the function to determine the some of integers from 1 to 5,000.
+4. Create a function `sum_n`that for any given value, say $n$, computes the sum of the integers from 1 to n (inclusive). Use the function to determine the sum of integers from 1 to 5,000.
 
 5. Create a function `altman_plot` that takes two arguments `x` and `y` and plots the difference against the sum.
 
