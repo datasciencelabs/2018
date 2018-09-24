@@ -34,7 +34,7 @@ murders %>% ggplot(aes(x = population/10^6, y = total, label = abb)) +
   scale_y_log10() +
   xlab("Populations in millions (log scale)") + 
   ylab("Total number of murders (log scale)") +
-  ggtitle("US Gun Murders in US 2010") +
+  ggtitle("US Gun Murders in 2010") +
   scale_color_discrete(name = "Region") +
   theme_economist()
 ```
@@ -122,7 +122,7 @@ murders %>% ggplot(aes(x = population/10^6, y = total, label = abb)) +
   scale_y_log10() +
   xlab("Populations in millions (log scale)") + 
   ylab("Total number of murders (log scale)") +
-  ggtitle("US Gun Murders in US 2010") +
+  ggtitle("US Gun Murders in 2010") +
   scale_color_discrete(name="Region") +
   theme_economist()
 ```
