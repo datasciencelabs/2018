@@ -1,0 +1,341 @@
+## Programming basics
+
+We teach R because it greatly facilitates data analysis, the main topic of this course Coding in R we can efficiently perform exploratory data analysis, build data analysis pipelines and prepare data visualization to communicate results. However R is not just a data analysis environment, but a programming language. Advanced R programmers can develop complex packages and even improve R itself, but we do not cover advanced progamming in this course. However, in this section we introduce three key programming concepts: conditional expressions, for-loops and functions. These are not just key building blocks for advanced programming, but ocassionaly come in handy during data analysis. We also provide a list of power functions that we dot not cover in the course but are worth knowing about as they are powerful tools commonly used by expert data analysts.
+
+### Conditional expressions
+
+Conditional expressions are one of the basic features of programming. The most common conditional expression is the `if-else` statement. In R, we can actually perform quite a bit of data analysis without conditionals. However, they do come up occasionally and if once you start writing your own functions and packages you will definitely need them.
+
+Here is a very simple example showing the general structure of an `if-else` statement. The basic idea is to print the reciprocal of `a` unless `a` is 0:
+
+```{r}
+a <- 0
+
+if(a!=0){
+  print(1/a)
+} else{
+  print("No reciprocal for 0.")
+}
+```
+
+
+Let's look at one more example using the US murders data frame.
+
+```{r}
+library(dslabs)
+data(murders)
+murder_rate <- murders$total/murders$population*100000
+```
+
+
+Here is a very simple example that tells us if the lowest murder rate is smaller than 0.5 per 100,000. The else statement protects us from the case in which the state with the smallest murder rate dosen't satisfy the condition.
+
+```{r}
+ind <- which.min(murder_rate)
+
+if(murder_rate[ind] < 0.5){
+  print(murders$state[ind]) 
+} else{
+  print("Minumum murder rate is not that low.")
+}
+```
+
+If we try it again with a rate of 0.25 we get a different answer:
+
+```{r}
+if(murder_rate[ind] < 0.25){
+  print(murders$state[ind]) 
+} else{
+  print("Minumum murder rate is not that low.")
+}
+```
+
+A related function that is very useful is `ifelse`. This function takes three arguments: a logical and two possible answers. If the logical is `TRUE` the first answer is returned and if `FALSE` the second. Here is an example
+
+```{r}
+a <- 0
+ifelse(a > 0, 1/a, NA)
+```
+
+The function is particularly useful because it works on vectors. It examines each element of the logical vector and returns corresponding answers from them accordingly.
+
+```{r}
+a <- c(0,1,2,-4,5)
+result <- ifelse(a > 0, 1/a, NA)
+```
+
+This table helps us see what happned:
+```{r, echo=FALSE}
+knitr::kable(data.frame(a = a, is_a_positive = a>0, answer1 = 1/a, answer2 = NA, result = result))
+```
+
+Here is an example of how this function can be readily used to replace all the missing values in a vector with zeros:
+
+```{r}
+data(na_example)
+no_nas <- ifelse(is.na(na_example), 0, na_example) 
+sum(is.na(no_nas))
+```
+
+Two other useful functions are `any` and `all`. The `any` function takes a vector of logicals and returns `TRUE` if any of the entries are `TRUE`. The `all` function takes a vector of logicals and returns `TRUE` if all of the entries are `TRUE`. Here is an example.
+
+```{r}
+z <- c(TRUE, TRUE, FALSE)
+any(z)
+all(z)
+```
+
+### Defining Functions
+
+As you become more experienced you will find yourself needeing to perform the same operations over and over. A simple example is computing the average. We can compute the average of a vector `x` using the `sum` and `length` functions: `sum(x)/length(x)`. But because we do this so often it is much more efficient to write a function that performs this operation and thus someone already wrote the `mean` function. However, you will encounter situations in which the function does not already exist so R permits you to write your own. A simple version of function that computes the average can be defined like this
+
+```{r}
+avg <- function(x){
+  s <- sum(x)
+  n <- length(x)
+  s/n
+}
+```
+
+Now `avg` is a function that computes the mean:
+
+```{r}
+x <- 1:100
+identical(mean(x), avg(x))
+```
+
+Note that variables defined inside a function are not saved in the workspace. So while we use `s` and `n` when we call `avg`, their values are created and changed only during the call. Here are illustrative examples:
+
+```{r}
+s <- 3
+avg(1:10)
+s
+```
+
+Note how `s` is still `r s` after we call `avg`.
+
+
+In general, functions are objects, so we assign them to variable names with `<-`. The function `function` tells R you are about to define a function. The general form of a function definition looks like this.
+
+
+Also not that the functions you define can have multiple arguments as well as default values. For example, we can define a function that computes either the arithmetic or geometric average depending on a user defined variable like this:
+
+```{r}
+avg <- function(x, arithmetic = TRUE){
+  n <- length(x)
+  ifelse(arithmetic, sum(x)/n, prod(x)^(1/n))
+}
+```
+
+We will learn more about how to create functions through experience as we face more complex tasks.
+
+
+
+### For loops
+
+The formula for the sum $1+2+\dots+n$ is $\frac{n(n+1)}{2}$. What if we weren't sure that was the right function, how could we check? Using what we learned about functions we can create one that computes the sum $S_n$:
+
+```{r}
+compute_s_n <- function(n){
+  x <- 1:n
+  sum(x)
+}
+```
+
+Now if we can compute $S_n$ for various vales of $n$, say $n=1,\dots,25$ how do we do it? Do we write 25 lines of code calling `compute_s_n`? No, that is what for loops are for in programming. Note that we are performing exactly the same task over and over and that the only thing that is changing is the value of $n$. For loops let us define the range that our variable takes (in our example $n=1,\dots,10$), then change the value as you _loop_ and evaluate an expression as you loop. The general form looks like this:
+
+
+```{r}
+for(i in 1:5){
+  print(i)
+}
+```
+
+And here is the for loop we would write for our $S_n$ example:
+
+```{r}
+m <- 25
+s_n <- vector(length = m) # create an empty vector
+for(n in 1:m){
+  s_n[n] <- compute_s_n(n)
+}
+```
+In each iteration $n=1$, $n=2$, etc..., we compute $S_n$ and store it in the $n$th entry of `s_n`.
+
+Now we can create a plot to search for a pattern.
+
+```{r sum-of-consecutive-squares}
+n <- 1:m
+plot(n, s_n)
+```
+
+If you noticed that it appears to be a quadratic, you are on the right track because the formula is $\frac{n(n+1)}{2}$ which we can confirm with a table:
+
+```{r show_s_n_table, echo=FALSE}
+head(data.frame(s_n = s_n, formula = n*(n+1)/2))
+```
+
+We can also overlay the two results by using the function `lines` to draw a line over the previously plotted points:
+
+```{r}
+plot(n, s_n)
+lines(n, n*(n+1)/2)
+```
+
+
+### Other functions
+
+It turns out that we rarely use for loops in R. This is because there are usually more powerful ways to perform the same task. Functions that are typically used instead of for loops are the apply family: `apply`, `sapply`, `tapply`, and `mapply`. We do not cover these functions in this course but they are worth learning if you intend to go beyond this introduction. Other functions that are widely used are `split`, `cut`, and `Reduce`.
+
+
+
+### Assessment
+
+
+1. What will this conditional expression return?
+
+    ```{r}
+    x <- c(1,2,-3,4)
+    
+    if(all(x>0)){
+      print("All positives")
+    } else{
+      print("Not all positives")
+    }
+    ```
+    
+    "Not all positives", because there is at least one element of `x` that is not positive, namely the 3rd one.
+
+2. Which of the following expressions is always `FALSE` when at least one entry of a logical vector `x` is TRUE?
+
+    A. `all(x)`
+    
+    B. `any(x)`
+    
+    C. `any(!x)`
+    
+    D. `all(!x)`
+
+    D. If at least one entry of `x` is `TRUE`, the at least one entry of `!x` is `FALSE`. Therefore, `all(!x)` is `FALSE` since there is at least one entry of `!x` that is `FALSE`.
+
+    Here are counterexample for the other three choices:
+
+    ```{r}
+    # counter-example for A that returns TRUE
+    x <- c(TRUE, TRUE)
+    all(x)
+    
+    # counter-example for B and C that return TRUE
+    x <- c(TRUE, FALSE)
+    any(x)
+    any(!x)
+    ```
+
+3. The function `nchar` tells you how many characters long a character vector is. For example:
+
+    
+    ```{r}
+    library(dslabs)
+    data(murders)
+    char_len <- nchar(murders$state)
+    char_len[1:5]
+    ```
+
+
+    Write a line of code that assigns to the object `new_names` the state abbreviation when the state name is longer than 8 characters.
+    
+    ```{r}
+    new_names <- ifelse(nchar(murders$state) > 8,
+                        murders$abb,
+                        murders$state)
+    new_names
+    ```
+        
+
+4. Create a function `sum_n`that for any given value, say $n$, computes the sum of the integers from 1 to n (inclusive). Use the function to determine the sum of integers from 1 to 5,000.
+
+    ```{r}
+    sum_n <- function(n) {
+        x <- 1:n
+        sum(x)
+    }
+    
+    sum_n(5000)
+    ```
+
+5. Create a function `altman_plot` that takes two arguments `x` and `y` and plots the difference against the sum.
+
+    ```{r}
+    altman_plot <- function(x, y) {
+        diff_xy <- x - y
+        sum_xy <- x + y
+        plot(sum_xy, diff_xy, main = "Altman Plot of X and Y",
+             xlab = "X + Y", ylab = "X - Y")
+    }
+    
+    x <- 1:10
+    y <- x * 2
+    altman_plot(x, y)
+    ```
+
+6. After running the code below, what is the value of `x`?
+
+    ```{r}
+    x <- 3
+    my_func <- function(y){
+    x <- 5
+    y+5
+    }
+    ```
+
+    Still 3. First, we just defined `my_func` but did not run it, so anything inside the curly braces would not be executed until we called `my_func` using `my_func(2)` (pass in any number for y).
+
+    Further, even if we ran `my_func`, the `x` inside the function does not  affect the value of `x` outside the function, nor is it visible outside the function. In computer science terms, we say that the *scope* of the `x` inside the function is only within the set of curly braces. Therefore, when we execute `x` after executing `my_func(2)`, the value printed is still 3.
+
+    ```{r}
+    x <- 3
+    my_func <- function(y){
+        x <- 5
+        y+5
+    }
+    x
+    my_func(2)
+    x
+    ```
+
+7. Write a function `compute_s_n` that for any given $n$ computes the sum $S_n = 1^2 + 2^2 + 3^2 + \dots + n^2$. Report the value of the sum when $n=10$.
+
+    ```{r}
+    compute_s_n <- function(n) {
+        x <- 1:n
+        sum(x^2)
+    }
+    
+    compute_s_n(10)
+    ```
+    
+
+8. Now define an empty numerical vector `s_n` of size 25 using `s_n <- vector("numeric", 25)` and store in the results of $S_1, S_2, \dots S_{25}$.
+    
+    ```{r}
+    s_n <- vector("numeric", 25)
+    
+    for (i in 1:25) {
+        s_n[i] <- compute_s_n(i)
+    }
+    ```
+
+
+9. Plot $S_n$ versus $n$. Use points defined by $n=1,\dots,25$.
+
+    ```{r}
+    n <- 1:25
+    plot(n, s_n)
+    ```
+
+10. Confirm that the formula for this sum is $S_n= \frac{n(n+1)(2n+1)}{6}$.
+
+    ```{r}
+    plot(n, s_n)
+    lines(n, n * (n + 1) * (2 * n + 1) / 6)
+    ```
