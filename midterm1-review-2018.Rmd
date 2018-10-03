@@ -1,0 +1,71 @@
+---
+title: "Midterm Review 2018"
+output: html_document
+---
+### Format
+* The midterm will be on Monday, October 10th from 9:45-11:15am.
+
+
+* Exam will be through Canvas.
+
+
+* There will be 11 questions. If you answer 10 questions correctly, you will receive 100%. If you answer all 11 questions correctly, you will also receive extra credit. 
+
+
+* Each question will be multiple choice, but you will have to write and run code on your laptop in order to answer some questions. You are graded soley on the answer you choose, not the code you write to get the answer.
+
+
+* The use of cell phones is **NOT** permitted during the exam.
+
+
+* You may use lecture notes, homework solutions and the internet during the exam. However, we will be walking around to make sure nobody is messaging each other on Slack, gchat, or any other kind of instant message platform. This is an individual exam and communication with other students is **NOT** permitted.
+
+
+* If you have a question during the exam, raise your hand and a TA or the instructor will walk over to you. **DO NOT ask questions on Slack.**
+
+
+* Please sit in any row except the back row. This will make it easier for the teaching staff to walk around and answer questions.
+
+
+* There will be a sign-in sheet in the front of the room. Please sign-in before the exam begins. This will track attendance and serve as an academic integrity contract for the exam.  
+
+
+### Major topics included (not an exhaustive list)
+
+* Loading data into R
+* Data Wrangling
+* Basic Plots
+* Plotting with `ggplot2`
+* Visualization principles
+
+
+### Major functions to review (not an exhaustive list)
+
+* `read.csv()`
+* `group_by()`
+* `summarize()`
+* `filter()`
+* `mutate()`
+* `%>%`
+* `function(){}`
+* `ggplot()`; refer to [cheatsheet](https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf)
+* `seq()`
+* `c()`
+* `data.frame()`
+* `which()`
+* `is.na()`
+* `print()`
+* `for()`
+* `ifelse()`
+* `mean()`
+* `sd()`
+* `sqrt()`
+* `sum()`
+
+
+### Major packages to load (not an exhaustive list)
+
+* `dslabs`
+* `tidyverse`
+* `dplyr`
+* `ggplot2`
