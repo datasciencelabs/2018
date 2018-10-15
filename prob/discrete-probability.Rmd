@@ -459,11 +459,6 @@ prob <- sapply(n, compute_prob)
 plot(n, prob)
 ```
 
-Now let's compute the exact probabilities rather than use Monte Carlo approximations. Not only do we get the exact answer using math but the computations are  much faster since we don't have to generate experiments.  
-
-
-To make the math simpler, instead of computing the probability of it happening we will compute the probability of it not happening. We use the multiplication rule.
-
 
 ### How many Monte Carlo experiments are enough
 
