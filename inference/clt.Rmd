@@ -1,0 +1,165 @@
+## Central Limit Theorem in Practice
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(dslabs)
+ds_theme_set()
+```
+
+The CLT tells us that the distribution function for a sum of draws is approximately normal. We also learned that dividing a normally distributed random variable by a constant results in a normally distributed variable. This implies that the distribution of $\bar{X}$ is approximately normal. 
+
+So in summary we have that $\bar{X}$ has an approximately normal distribution with expected value $p$ and standard error $\sqrt{p(1-p)/N}$. 
+
+Now how does this help us? Suppose we want to know what is the probability that we are within 1% from $p$. We are basically asking if 
+
+$$
+\mbox{Pr}(| \bar{X} - p| \leq .01)
+$$
+which is the same as:
+
+$$
+\mbox{Pr}(\bar{X}\leq p + .01) - \mbox{Pr}(\bar{X} \leq p - .01)
+$$
+
+Can we answer this question? Note that we can use the mathematical trick we learned in a previous lecture Subtract the expected value and divide by the standard error to get a standard normal random variable, call it $Z$, on the left. Since $p$ is the expected value and $\mbox{SE}(\bar{X}) = \sqrt{p(1-p)/N}$ is the standard error we get:
+
+$$
+\mbox{Pr}\left(Z \leq \,.01 / \mbox{SE}(\bar{X}) \right) -
+\mbox{Pr}\left(Z \leq - \,.01 / \mbox{SE}(\bar{X}) \right) 
+$$
+
+A problem is that we don't know $p$, so we don't know $\mbox{SE}(\bar{X})$. But it turns out that the CLT still works if we estimate the standard error by using $\bar{X}$ in place of $p$. We say that we _plug-in_ the estimate. Our estimate of the standard error is therefore:
+
+$$
+\hat{\mbox{SE}}(\bar{X})=\sqrt{\bar{X}(1-\bar{X})/N}
+$$
+In statistics textbooks, we use a little hat to denote estimates. Note that the estimate can be constructed using the observed data and $N$. 
+
+Now  we continue with our calculation but dividing by $\hat{\mbox{SE}}(\bar{X})=\sqrt{\bar{X}(1-\bar{X})/N})$ instead. In our first sample we had 12 blue and 13 red so $\bar{X} = 0.48$ and so our estimate of standard error is 
+
+```{r}
+X_hat <- 0.48
+se <- sqrt(X_hat*(1-X_hat)/25)
+se
+```
+
+And now we can answer the question of the probability of being close to $p$. The answer is
+
+```{r}
+pnorm(0.01/se) - pnorm(-0.01/se)
+```
+
+So there is a small chance that we will be close. A poll of only $N=25$ people is not really very useful. At least for close elections. 
+
+Earlier we mentioned the _margin of error_. Now we can define it because it is simply two times the standard error  which we can now estimate and in our case it is:
+
+```{r}
+2*se
+```
+
+Why do we multiply by 2? Because if you ask what is the probability that we are within two standard errors from $p$ we get:
+
+$$
+\mbox{Pr}\left(Z \leq \, 2\mbox{SE}(\bar{X})  / \mbox{SE}(\bar{X}) \right) -
+\mbox{Pr}\left(Z \leq - 2 \mbox{SE}(\bar{X}) / \mbox{SE}(\bar{X}) \right) 
+$$
+which is 
+
+$$
+\mbox{Pr}\left(Z \leq 2 \right) -
+\mbox{Pr}\left(Z \leq - 2\right) 
+$$
+
+which we know is about 95\%:
+
+```{r}
+pnorm(2)-pnorm(-2)
+```
+
+So there is a 95% that $\bar{X}$ will be within $2\times \hat{SE}(\bar{X})$, in our case `r round(2*se)`, to $p$. Note that 95% is somewhat of an arbitrary choice and sometimes other percentages are used, but it is the most commonly used value to define _margin of error_. 
+
+In summary, the CLT tells us that our poll based on a sample size of $25$ is notvery useful. We don't really learn much when the margin of error is this large. All we can really say is that the popular vote will not be won by a large margin. This is why pollsters tend to use larger sample sizes. 
+
+Typical sample sizes range from 500 to 3,500. To see how this gives us a much more practical result, note that if we had obtained $\bar{X}$=0.48 with a sample size of 2,000 our standard error $\hat{\mbox{SE}}(\bar{X})$ would have been `r n<-2000;se<-sqrt(0.48*(1-0.48)/n);se`. So our result is an estimate of `48`% with a margin of error  `r round(2*se*100)`%. In this case, the result is much more informative and would make us think that there are more red balls than blue. But keep in mind, this is hypothetical. We did not actually take a poll of 2,000.
+
+
+### A Monte Carlo simulation
+
+
+Suppose we want to use a Monte Carlo simulation to corroborate the tools we have built using probability theory. To create a simulation we would write code like this:
+
+```{r, eval=FALSE}
+B <- 10000
+N <- 1000
+Xhat <- replicate(B, {
+  X <- sample(c(0,1), size=N, replace=TRUE, prob=c(1-p, p))
+  mean(X)
+})
+```
+
+The problem is, of course, we don't know `p`. We could
+construct an urn like the one pictured above and run an analog (without a computer) simulation. It would take a long time, but you could take 10,000 samples, count the beads and keep track of the 
+proportions of blue. We can use the function `take_poll(n=1000)` instead of drawing from an actual urn, but it would still take time to count the beads and enter the results.
+
+So, one thing we do to corroborate theoretical results is to pick one, or several values of `p`, and run the simulations. Let's set `p=0.45`.  We can then simulate a poll:
+
+```{r}
+p <- 0.45
+N <- 1000
+
+X <- sample(c(0,1), size=N, replace=TRUE, prob=c(1-p, p))
+Xhat <- mean(X)
+```
+
+In this particular sample our estimate is `Xhat`. We can use that code to do a Monte Carlo simulation:
+
+```{r}
+B <- 10000
+Xhat <- replicate(B, {
+  X <- sample(c(0,1), size=N, replace=TRUE, prob=c(1-p, p))
+  mean(X)
+})
+```
+
+To review, the theory tells us that $\bar{X}$ has is approximately normally distributed, has expected value $p=$`r p` and standard error $\sqrt{p(1-p)/N}$ = `r sqrt(p*(1-p)/N)`. The simulation confirms this
+
+```{r}
+mean(Xhat)
+sd(Xhat)
+```
+
+A histogram and qq-plot confirm that the the normal approximation is accurate as well:
+
+```{r,echo=FALSE, warning=FALSE, message=FALSE}
+library(gridExtra)
+p1 <- data.frame(Xhat=Xhat) %>% 
+  ggplot(aes(Xhat)) + 
+  geom_histogram(binwidth = 0.005, color="black")
+p2 <-  data.frame(Xhat=Xhat) %>% 
+  ggplot(aes(sample=Xhat)) + 
+  stat_qq(dparams = list(mean=mean(Xhat), sd=sd(Xhat))) + geom_abline() + ylab("Xhat") + xlab("Theoretical normal")
+grid.arrange(p1,p2, nrow=1)
+```
+
+Again, note that in a real life we would never be able to run such an experiment because we don't know $p$. But we could run it for various values of $p$ and $N$ and see that the theory does indeed work well for most values. You can easily do this by re-running the code above after changing `p` and `N`.
+
+### The spread
+
+The competition is to predict the spread not the proportion $p$. However, because we are assuming there are only two parties, we know that the spread is $p - (1-p) = 2p - 1$.  So everything we have done can easily be adapted to an estimate of $2p - 1$. Once we have our estimate $\bar{X}$ and $\hat{\mbox{SE}}(\bar{X})$ we estimate the spread with $2\bar{X} - 1$ and, since we are multiplying by 2, the standard error is $2\hat{\mbox{SE}}(\bar{X})$. Note that subtracting 1 does not add any variability so it does not affect the standard error. 
+
+So for our 25 sample above, our estimate $p$ is `.48` with margin of error `.20` so our estimate of the spread is `0.04` with margin of error `.40`. Again, not a very useful sample size. But the point is that once we have an estimate and standard error for $p$, we have it for the spread $2p-1$.
+
+
+### Bias: Why not run a very large poll?
+
+Note that for realistic value of $p$, say from 0.35 to 0.65, if we run a very large poll with 100,000 people, theory would tell us that we would predict the election perfectly since the largest possible margin of error is around 0.3\%. Here are the calculations:
+
+```{r}
+N <- 100000
+p <- seq(0.35, 0.65, length = 100)
+SE <- sapply(p, function(x) 2*sqrt(x*(1-x)/N))
+data.frame(p=p, SE = SE) %>% ggplot(aes(p, SE)) + 
+  geom_line()
+``` 
+
+One reason is that running such a poll is very expensive. But perhaps a more important reason is that theory has it's limitations. Polling is much more complicated than picking beads from an urn. People might lie to you and others might not have phones. But perhaps the way an actual poll is most different from an urn model is that we actually don't know for sure who is in our population and who is not. How do we know who is going to vote? Are we reaching all possible voters? So even if our margin of error is very small it might not be exactly right that our expected value is $p$. We call this bias. Historically, we observe that polls are indeed biased although not by that much. The typical bias appears to be about 1-2%. This makes election forecasting a bit more interesting and we will talk about how to model this in a later lecture.

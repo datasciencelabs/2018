@@ -1,0 +1,318 @@
+## Statistical Models
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(dslabs)
+ds_theme_set()
+set.seed(2)
+```
+
+"All models are wrong, but some are useful" -George E. P. Box
+
+### Poll Aggregators
+ 
+As we described earlier, in 2012 Nate Silver was giving Obama a 90% chance of winning. Yet, none of the individual polls where that close. Political commentator Joe Scarborough said [during his show](https://www.youtube.com/watch?v=TbKkjm-gheY) 
+
+>>Anybody that thinks that this race is anything but a tossup right now is such an ideologue ... they're jokes.". 
+
+To which Nate Silver responded:
+
+
+>> If you think it's a toss-up, let's bet. If Obama wins, you donate $1,000 to the American Red Cross. If Romney wins, I do. Deal?
+
+How was Mr. Silver so confident? We will demonstrate why Nate Silver was so confident using the entries to our percent of blue beads competition.
+
+```{r, message=FALSE}
+library(googlesheets)
+key <- extract_key_from_url("https://docs.google.com/spreadsheets/d/10XDytKew6uqgJoKrq738R3pz4_wKzhAsfbl1599eBfQ/edit#gid=701311203")
+bc <- gs_key(key)
+title <- gs_ws_ls(bc)
+beads <- gs_read(ss=bc, ws = title, skip = 1)
+
+# convert to data.frame
+beads <- as.data.frame(beads)
+
+beads <- beads %>% 
+    setNames(c("Timestamp", "name", "estimate", "N", "interval_size")) %>%
+    mutate(estimate = parse_number(estimate))
+```
+
+Who won the competition?
+```{r}
+p <- 0.529 * 100
+beads <- beads %>% select(-Timestamp) %>%
+  mutate(lower = estimate - interval_size/2, upper = estimate + interval_size/2, size = upper - lower, 
+                 hit = lower <= p & upper >= p,
+                 includes_zero = lower <= 50 & upper >=50) %>% 
+  arrange(desc(hit), size)
+beads
+```
+
+Are these 95% confidence intervals?
+```{r}
+tmp <- data.frame(N = seq(pmax(min(beads$N),20), max(beads$N), len = 100)) %>% mutate(sqrt_N = sqrt(N))
+beads %>% filter(N>0) %>% ggplot(aes(N, size)) + geom_point() + geom_line(data = tmp, aes(N, 100*sqrt(.25)/sqrt_N))
+```
+
+Here is a plot
+
+```{r}
+beads %>% mutate(name = factor(name, levels=rev(unique(name)))) %>%
+  ggplot(aes(x=name, y=estimate)) + 
+  geom_hline(yintercept = p) + 
+  geom_point(col="#00B6EB")+
+  geom_errorbar(aes(ymin=lower, ymax=upper), col="#00B6EB") + 
+  coord_flip() 
+```
+
+What would Nate Silver do?
+
+```{r, eval=FALSE}
+agg <- beads %>% filter(N>0) %>% summarize(avg = mean(estimate), se = sd(estimate)/sqrt(n()), N = sum(N))
+nate <- data.frame(name = "Nate Silver", estimate = agg$avg, N = agg$N, 
+                   interval_size = 2*1.96*agg$se, stringsAsFactors = FALSE) %>%
+  mutate(lower = estimate - interval_size/2, upper = estimate + interval_size/2, size = upper - lower,  
+         hit = lower <= p & upper >= p, includes_zero = lower <= 50 & upper >=50)
+beads %>% bind_rows(beads, nate)  %>%  arrange(desc(hit), size) %>% View()
+```
+
+We can also demonstrate how Mr. Silver saw what Mr. Scarborough did not using a Monte Carlo simulation. We generate results for 12 polls taken the week before the election. We mimic sample sizes from actual polls and construct and report 95\% confidence intervals for each of the 12 polls:
+
+```{r}
+d <- 0.039
+Ns <- c(1298, 533, 1342, 897, 774, 254, 812, 324, 1291, 1056, 2172, 516)
+p <- (d + 1)/2
+
+confidence_intervals <- sapply(Ns, function(N) {
+  X <- sample(c(0,1), size=N, replace=TRUE, prob=c(1-p, p))
+  X_hat <- mean(X)
+  SE_hat <- sqrt(X_hat*(1-X_hat)/N)
+  2*c(X_hat, X_hat - 2*SE_hat, X_hat + 2*SE_hat)-1
+})
+```
+
+Let's save the results from this simulation in a data frame:
+
+```{r}
+polls <- data.frame(poll=1:ncol(confidence_intervals), 
+                  t(confidence_intervals), 
+                  sample_size=Ns)
+names(polls)<-c("poll", "estimate", "low", "high", "sample_size")
+polls
+```
+
+Here is a visualization of what the intervals the pollsters would have reported for the difference between Obama and Romney:
+
+```{r, message=FALSE, echo=FALSE}
+ggplot(polls, aes(poll, estimate, ymin=low, ymax=high)) + 
+  geom_hline(yintercept = 0) + 
+  geom_point(col="#00B6EB")+
+  geom_errorbar(col="#00B6EB") + 
+  coord_flip() +
+  scale_x_continuous(breaks=c(1,ncol(polls))) +
+  scale_y_continuous( limits = c(-0.17, 0.17)) +
+  geom_hline(yintercept = 2*p-1, lty=2) 
+```
+
+Not surprisingly, all 12 polls report confidence intervals that include the election night result (dashed line). However, all 12 polls include 0 (solid black line) as well.  Therefore, individually, if asked for a prediction the pollsters would have to agree with Scarborough: it's a toss up. Below we describe how they are missing a key insight.
+ 
+Poll aggregators, such as Nate Silver, realized that by combining the results of different polls you could greatly improve precision. By doing this, effectively, we are conducting a poll with a huge sample size. As a result we can report a smaller 95\% confidence interval, and therefore a more precise prediction. 
+
+Although as aggregators we do not have access to the raw poll data, we can use mathematics to reconstruct what we would have obtained had we made one large poll with
+
+```{r}
+sum(polls$sample_size)
+```
+
+participants. Basically we construct an estimate of the spread, let's call it $d$, with a weighted average in the following way:
+
+```{r}
+d_hat <- polls %>% 
+  summarize(avg = sum(estimate*sample_size) / sum(sample_size)) %>% 
+  .$avg
+```
+
+Once we have an estimate of $d$ we can construct an estimate for the proportion voting for Obama which we can then use to estimate the standard error. Once we do this we see that our margin of error is `r p_hat <- (1+d_hat)/2; moe <- 2*1.96*sqrt(p_hat*(1-p_hat)/sum(polls$sample_size)); moe`. 
+
+Thus we can predict that the spread will be `r round(d_hat*100,1)` plus or minus `r round(moe*100 ,1)`, which not only includes the actual result but is quite far from including 0. Once we combine the 12 polls we become quite certain that Obama will win the popular vote.
+
+```{r,echo=FALSE}
+polls2 <- rbind(polls,c(13, d_hat, d_hat-moe, d_hat+moe, sum(polls$sample_size)))
+polls2[,1]<-as.character(polls2[,1]);polls2[13,1] <- "Avg"
+polls2$col <- as.character(c(rep(2,12),1))
+ggplot(polls2, aes(poll, estimate, ymin=low, ymax=high, color=col)) + 
+  geom_hline(yintercept = 0) + 
+  geom_point(show.legend = FALSE)+
+  geom_errorbar(show.legend = FALSE) + 
+  coord_flip() +
+  scale_y_continuous( limits = c(-0.17, 0.17)) +
+  geom_hline(yintercept = 2*p-1, lty=2) 
+```
+
+Note that this was just a simulation to illustrate the idea. The actual data science exercise of forecasting elections is much more complicated. It involves modeling. Below we explain how pollsters fit multilevel models to the data and use this to forecast election results. In the 2008 and 2012 US presidential elections, Nate Silver used this approach to make almost perfect predictions and silence the pundits.
+
+Since the 2008 elections, other organizations have started their own election forecasting groups that, like Nate Silver, aggregate polling data and use statistical models to make predictions. In 2016, forecasters underestimated Trump's chances of winning greatly. 
+
+```{r, echo=FALSE}
+knitr::include_graphics("img/pollster-2016-predictions.png")
+```
+
+For example, the Princeton Election Consortium gave Trump less than 1% while the Huffington Post gave him a 2%. In contrast, FiveThirtyEight had this probability at 29%, higher than tossing two coins and getting two heads. By understanding statistical models and how these forecasters use them, we will start to understand how this happened.
+
+Although not nearly as interesting as predicting the electoral college, for illustrative purposes we will start by looking at predictions for the popular vote. FiveThirtyEight predicted a 3.6% advantage for Clinton, included the actual result of 2.1% (48.2% to 46.1%) in their interval, and was much more confident about Clinton winning this, giving her an 81.4% chance of winning.
+
+
+```{r, echo=FALSE}
+knitr::include_graphics("img/popular-vote-538.png")
+```
+
+We introduce actual data from the 2016 US presidential election to show how models are motivated and built to produce these predictions.
+
+### Poll data
+
+We use public polling data organized by FiveThirtyEight for the 2016 presidential election. The data is included as part of of the `dslabs` package:
+
+```{r}
+data(polls_us_election_2016)
+names(polls_us_election_2016)
+```
+
+The table includes results for national polls as well as state polls taken during the year before the election. For this first illustrative example, we will filter the data to include national polls that happened during the week before the election. We also remove polls that FiveThirtyEight has determined not to be reliable and graded with "B" or less. Some polls have not been graded and we include those:
+
+```{r}
+polls <- polls_us_election_2016 %>% 
+  filter(state == "U.S." & enddate >= "2016-10-31" &
+           (grade %in% c("A+","A","A-","B+") | is.na(grade)))
+```
+
+We add a spread estimate:
+
+```{r}
+polls <- polls %>% 
+  mutate(spread = rawpoll_clinton/100 - rawpoll_trump/100)
+```
+
+For illustrative purposes, we will assume that there are only two parties and call $p$ the proportion voting for Clinton and $1-p$ the proportion voting for Trump. We are interested in the spread $2p-1$. Let's call the spread $d$ (for difference). 
+
+
+Note that we have `r nrow(polls)` estimates of the spread.  
+The theory we learned tells us that these estimates are a random variable with a probability distribution that is approximately normal. The expected value is the election night spread $d$ and the standard error is $2\sqrt{p (1 - p) / N}$. Assuming the urn model we described earlier is a good one, we can use this information to construct a confidence interval based on the aggregated data. The estimated spread is:
+
+```{r}
+d_hat <- polls %>% summarize(d_hat = sum(spread * samplesize) / sum(samplesize)) %>% .$d_hat
+```
+
+and the standard error is:
+
+```{r}
+p_hat <- (d_hat+1)/2 
+moe <- 1.96 * 2 * sqrt(p_hat*(1-p_hat)/sum(polls$samplesize))
+moe
+```
+
+So we report a spread of `r round(d_hat*100,2)`\% with a margin of error of `r round(moe*100,2)`\%. On election night we find out that the actual percentage was 2.1\% which is outside a 95\% confidence interval. 
+
+What happened? 
+
+A histogram of the reported spreads shows a problem:
+```{r}
+polls %>%
+  ggplot(aes(spread)) +
+  geom_histogram(color="black", binwidth = .01)
+```
+
+The data does not appear to be normally distributed and the standard error appears to be larger than `r moe`. The theory is not quite working here.
+
+### Pollster bias
+
+Notice that various pollsters are involved and some are taking several polls a week:
+
+```{r}
+polls %>% group_by(pollster) %>% summarize(n())
+```
+
+Let's visualize the data for the pollsters that are regularly polling:
+
+```{r}
+polls %>% group_by(pollster) %>% 
+  filter(n() >= 6) %>%
+  ggplot(aes(pollster, spread)) + 
+  geom_point() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+This plot reveals an unexpected result. First note that the standard error predicted by theory for each poll:
+
+```{r}
+polls %>% group_by(pollster) %>% 
+  filter(n() >= 6) %>%
+  summarize(se = 2 * sqrt( p_hat * (1-p_hat) / median(samplesize)))
+```
+
+is between 0.018 and 0.033 which agrees with the within poll variation we see. However, there appears to be differences _across the polls_. Note for example how the USC Dornsife/LA Times pollster is predicting a 4%\ win for Trump, while Ipsos is predicting a win larger than 5\% for Clinton. The theory we learned says nothing about different pollsters producing polls with different expected values. All the polls should have the same expected value. FiveThirtyEight refers to these differences as "house effects". We can also call them _pollster bias_. 
+
+Rather than use the urn model theory we are instead going to develop a data-driven model. 
+
+
+### Data driven model
+
+For each pollster, let's collect their last reported result before the election:
+
+```{r}
+one_poll_per_pollster <- polls %>% group_by(pollster) %>% 
+  filter(enddate == max(enddate)) %>%
+  ungroup()
+```
+
+Here is a histogram of the data for these  `r nrow(one_poll_per_pollster)` pollsters:
+ 
+```{r}
+one_poll_per_pollster %>%
+  ggplot(aes(spread)) + geom_histogram(binwidth = 0.01)
+```
+
+In the previous section we saw that using the urn model theory to combine these results might not be appropriate due to the pollster effect. Instead we will model this spread data directly.
+
+The new model **can also be thought as an urn model** although the connection is not as direct. Rather than 0s (republicans) and 1s (democrats) our urn now contains poll results from all possible pollsters. We _assume_ that the expected value of our urn is the actual spread $d=2p-1$. 
+
+When we model more complicated phenomena like outcomes from polls that include pollster bias, we have to make more assumptions that are sometimes challenging to deduce, so we motivate them with data. 
+
+When we model pollster effects, because rather than 0s and 1s, our urn contains continuous numbers between -1 and 1, the standard deviation of the urn is no longer $\sqrt{p(1-p)}$. 
+
+Rather than voter sampling variability, the standard error now includes the pollster to pollster variability. 
+
+Our new urn also includes the sampling variability from the polling. 
+
+Regardless, this standard deviation is now an unknown parameter. In statistics textbooks the Greek symbol $\sigma$ is used to represent this parameter. 
+
+In summary, we have two unknown parameters: the expected value $d$ and the standard deviation $\sigma$.
+
+Our task is to estimate $d$. Because we model the observed values $X_1,\dots ,X_N$ as a random sample from the urn, the CLT still works in this situation because it is an average of independent random variables. For a large enough sample size $N$, the probability distribution of the sample average $\bar{X}$ is approximately normal with expected value $\mu$ and standard error $\sigma/\sqrt{N}$. If we are willing to consider $N=15$ large enough, we can use this to construct confidence intervals. 
+
+A problem is that we don't know $\sigma$. But theory tells us that we can estimate the urn model $\sigma$ with the _sample standard deviation_ defined as:
+
+$$
+s = \frac{1}{N-1}\sum_{i=1}^N (X_i - \bar{X})^2
+$$
+
+Note that unlike for the population standard deviation definition, we now divide by $N-1$. This makes $s$ a better estimate of $\sigma$. There is a mathematical explanation for this, which is explained in most statistics textbooks, but we don't cover it here.
+
+The `sd` function in R computes the sample standard deviation:
+
+```{r}
+sd(one_poll_per_pollster$spread)
+```
+
+We are now ready to form a new confidence interval based on our new data driven model:
+
+```{r}
+results <- one_poll_per_pollster %>% 
+  summarize(avg = mean(spread), se = sd(spread)/sqrt(length(spread))) %>% 
+  mutate(start = avg - 1.96*se, end = avg + 1.96*se) 
+round(results*100,1)
+```
+
+Note that our confidence interval is wider now as it incorporates the pollster variability. It does include the election night result of 2.1%. Also note that it was small enough not to include 0 which means we were confident Clinton would win the electoral vote.
+
+Are we now ready to declare a probability of Clinton winning the popular vote? Not yet. In our model $d$ is a fixed parameter so we can't talk about probabilities. To provide probabilities, we will need to learn about Bayesian statistics.
+
