@@ -157,7 +157,7 @@ ggplot(tab, aes(poll, estimate, ymin=low, ymax=high, col = p_inside)) +
 
 ### The Correct Language
 
-When using the theory we described above it is important to remember that it is the intervals that are random not $p$. In the plot above we can see the random intervals moving around and $p$, represented with the vertical line, staying in the same place. The proportion of blue in the urn $p$ is not. So the 95\% relates to the probability that this random interval falls on top of $p$. Saying the $p$ has a 95\% of being between this and that is technically an incorrect statement. Again, because $p$ is not random. 
+When using the theory we described above it is important to remember that it is the intervals that are random not $p$. In the plot above we can see the random intervals moving around and $p$, represented with the vertical line, staying in the same place. The proportion of blue in the urn $p$ is not. So the 95\% relates to the probability that this random interval falls on top of $p$. Saying the $p$ has a 95\% chance of being between this and that is technically an incorrect statement. Again, because $p$ is not random. 
 
 
 ### Power
