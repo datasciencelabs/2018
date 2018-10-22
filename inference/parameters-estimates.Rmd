@@ -31,7 +31,7 @@ We have just described a simple sampling model for opinion polls. The beads insi
 
 You can take a sample by visiting [this page](https://dgrtwo.shinyapps.io/urn_drawing/)
 
-Once you are ready, submit your answer at [this link](https://docs.google.com/forms/d/e/1FAIpQLSdTt5sSf0G_7wb3LHVZGAejIBdIaOiIGx5d7F3_8FX0V7oQ7w/viewform)
+Once you are ready, submit your answer at [this link](https://docs.google.com/forms/d/e/1FAIpQLSddMHQTivvLzh6a5HFhHQZpS9E1Tirm2dEWorlrwmpFhC-bAw/viewform?usp=sf_link)
 
 
 ## Populations, samples, parameters and estimates
