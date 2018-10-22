@@ -154,7 +154,7 @@ Note that this was just a simulation to illustrate the idea. The actual data sci
 Since the 2008 elections, other organizations have started their own election forecasting groups that, like Nate Silver, aggregate polling data and use statistical models to make predictions. In 2016, forecasters underestimated Trump's chances of winning greatly. 
 
 ```{r, echo=FALSE}
-knitr::include_graphics("pollster-2016-predictions.png")
+knitr::include_graphics("img/pollster-2016-predictions.png")
 ```
 
 For example, the Princeton Election Consortium gave Trump less than 1% while the Huffington Post gave him a 2%. In contrast, FiveThirtyEight had this probability at 29%, higher than tossing two coins and getting two heads. By understanding statistical models and how these forecasters use them, we will start to understand how this happened.
@@ -163,7 +163,7 @@ Although not nearly as interesting as predicting the electoral college, for illu
 
 
 ```{r, echo=FALSE}
-knitr::include_graphics("popular-vote-538.png")
+knitr::include_graphics("img/popular-vote-538.png")
 ```
 
 We introduce actual data from the 2016 US presidential election to show how models are motivated and built to produce these predictions.
