@@ -121,7 +121,7 @@ Xhat <- replicate(B, {
 })
 ```
 
-To review, the theory tells us that $\bar{X}$ has is approximately normally distributed, has expected value $p=$`r p` and standard error $\sqrt{p(1-p)/N}$ = `r sqrt(p*(1-p)/N)`. The simulation confirms this
+To review, the theory tells us that $\bar{X}$ has is approximately normally distributed, has expected value $p=$ `r p` and standard error $\sqrt{p(1-p)/N}$ = `r sqrt(p*(1-p)/N)`. The simulation confirms this
 
 ```{r}
 mean(Xhat)
