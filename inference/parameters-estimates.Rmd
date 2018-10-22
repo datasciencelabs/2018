@@ -7,7 +7,7 @@ We will use an urn instead of voters and to mimic the competition between pollst
 
 
 ```{r, echo=FALSE, fig.height=2}
-knitr::include_graphics("img/urn.jpg")
+knitr::include_graphics("urn.jpg")
 ```
 
 Before making a prediction you can take a sample (with replacement) from the urn. To mimic the fact that running polls is expensive, it costs you \$0.10 per bead you sample. So if you have a sample size of 250, and you win, you will break even as you will pay me \$25 to collect your \$25 prize. Your entry into the competition can be an interval. If the interval you submit contains the true proportion you get half what you paid and pass to the second phase of the competition. In the second phase the entry with the smallest interval is selected as the winner. 
