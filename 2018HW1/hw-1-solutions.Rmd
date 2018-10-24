@@ -1,0 +1,72 @@
+---
+title: "Homework 1 Solutions"
+date: "Due 9/17/2017"
+output: html_document
+editor_options: 
+  chunk_output_type: inline
+---
+
+# Homework 1
+
+Several of your friends live in Europe and are offered jobs in a US company with many locations all across the country. The job offers are great but news with headlines such as [**US Gun Homicide Rate Higher Than Other Developed Countries**](http://abcnews.go.com/blogs/headlines/2012/12/us-gun-ownership-homicide-rate-higher-than-other-developed-countries/) have them worried. Charts like this make them worry even more:
+
+![US gun homicides second chart](https://everytownresearch.org/wp-content/uploads/2016/07/GunTrends_murders_per_1000.png) 
+
+You want to convince your friends that the US is a large and diverse country with 50 very different states as well as the District of Columbia (DC). You want to recommend some state for each friend knowing that some like hiking, others would like to be close to several large cosmopolitan cities. Use data from the US murders data set:
+
+```{r}
+library(dslabs)
+data(murders)
+```
+
+1. What is the state with the most murders? Would you say this is the most dangerous state? Hint: Make a plot showing the relationship between population size and number of murders.
+
+**Solution:** 
+```{r}
+murders$state[which.max(murders$total)]
+```
+
+California is the state with the most murders. However, this does not necessarily make California the most dangerous state. The following plot shows that the number of muders is highly correlated with the population of any given state. California, the state with the highest population, also has the highest total number of murders.
+
+```{r}
+plot(murders$population, 
+     murders$total,
+     xlab = "Population", 
+     ylab = "Murders",
+     main = "Population and Gun Murders Across US States")
+```
+
+2. Add a column to the murder data table called `murder_rate` with each states murder rate.
+
+**Solution:** 
+```{r}
+library(dplyr)
+murders <- murders %>% 
+    mutate(murder_rate = total / (population / 100000))
+
+## ## alternative approach
+## murders$murder_rate <- murders$total / murders$population
+```
+
+3. Describe the distribution of murder rates across states. How similar are states? How much do murder rates vary by geographical regions?
+
+**Solution:** The distribution is heavily right skewed with a couple clear outliers, i.e. states with notably higher murder rates than the remaining 48. The South has a noticeably higher murder rate than other regions.
+```{r}
+## can use histogram
+hist(murders$murder_rate, 
+     breaks = 15,
+     xlab = "Murders per 100,000", 
+     ylab = "Number of States",
+     main = "Murder Rates Across US States")
+
+## can use boxplot by region
+boxplot(murder_rate ~ region, 
+        data = murders,
+        xlab = "Region", 
+        ylab = "Murders per 100,000",
+        main = "Murder Rates by Region")
+```
+
+4. Write a report for your friends reminding them that the US is a large and diverse country with 50 very different states as well as the District of Columbia (DC). Suppose one of your friends loves hiking, one wants to live in a warm climate, and another would like to be close to several large cosmopolitan cities. Recommend a desirable state for each friend.
+
+**Solution:** A complete response should include suggestions for each of the three friends based on both their interests (e.g. by considering states good for hiking) and the data analyzed in the previous three problems (e.g. by considering state-level murder rates). 
