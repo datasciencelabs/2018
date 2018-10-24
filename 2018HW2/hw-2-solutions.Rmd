@@ -1,0 +1,169 @@
+---
+title: "Homework 2 Solutions"
+date: "Due 10/1/2017"
+output: html_document
+editor_options: 
+  chunk_output_type: inline
+---
+
+# Homework 2
+
+Vaccines have helped save millions of lives. In the 19th century, before herd immunization was achieved through vaccination programs, deaths from infectious diseases, like smallpox and polio, were common. However, today, despite all the scientific evidence for their importance, vaccination programs have become somewhat controversial.
+
+The controversy started with a [paper](http://www.thelancet.com/journals/lancet/article/PIIS0140-6736(97)11096-0/abstract) published in 1988 and lead by [Andrew Wakefield](https://en.wikipedia.org/wiki/Andrew_Wakefield) claiming there was a link between the administration of the measles, mumps and rubella (MMR) vaccine, and the appearance of autism and bowel disease. Despite much science contradicting this finding, sensationalists media reports and fear mongering from conspiracy theorists, led parts of the public to believe that vaccines were harmful. Some parents stopped vaccinating their children. This dangerous practice can be potentially disastrous given that the Center for Disease Control (CDC) estimates that vaccinations will prevent more than 21 million hospitalizations and 732,000 deaths among children born in the last 20 years (see [Benefits from Immunization during the Vaccines for Children Program Era — United States, 1994-2013, MMWR](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm6316a4.htm)). 
+
+Effective communication of data is a strong antidote to misinformation and fear mongering. In this homework you are going to prepare a report to have ready in case you need to help a family member, friend or acquaintance that is not aware of the positive impact vaccines have had for public health.
+
+The data used for these plots were collected, organized and distributed by the [Tycho Project](http://www.tycho.pitt.edu/). They include weekly reported counts data for seven diseases from 1928 to 2011, from all fifty states. We include the yearly totals in the `dslabs` package:
+
+```{r}
+library(dslabs)
+data(us_contagious_diseases)
+```
+
+1. Use the `us_contagious_disease` and `dplyr` tools to create an object called `dat` that stores only the Measles data, includes a per 100,000 people rate, and removes Alaska and Hawaii since they only became states in the late 50s. Note that there is a `weeks_reporting` column. Take that into account when computing the rate.
+
+**Solution:** 
+```{r}
+library(tidyverse)
+the_disease <- "Measles"
+dat <- us_contagious_diseases %>%
+    filter(!state %in% c("Hawaii","Alaska"),
+           disease == the_disease) %>%
+    mutate(rate = (count / weeks_reporting) * 52 / (population / 100000)) %>% 
+    mutate(state = reorder(state, rate)) 
+```
+
+2. Plot the Measles disease rates per year for California. Find out when the Measles vaccine was introduced and add a vertical line to the plot to show this year.
+
+**Solution:**  
+```{r}
+dat %>% 
+    filter(state == "California", !is.na(rate)) %>%
+    ggplot(aes(x = year, y = rate)) +
+    geom_line(alpha = 1/2) + 
+    geom_point() + 
+    ylab("Cases per 100,000") + 
+    xlab("Year") +
+    ggtitle("Measles Cases in California") + 
+    geom_vline(xintercept = 1963, col = "blue")
+```
+
+3. Note these rates start off as counts. For larger counts we can expect more variability. There are statistical explanations for this which we don't discuss here. But transforming the data might help stabilize the variability such that it is closer across levels. For 1950, 1960, and 1970, plot the histogram of the data across states with and without the square root transformation. Which seems to have more similar variability across years? Make sure to pick binwidths that result in informative plots.
+
+**Solution:** First, we plot the histogram of rates across states for the years 1950, 1960, and 1970 without the square root transformation.
+```{r}
+dat %>% 
+    filter(year %in% c(1950,1960,1970), !is.na(rate)) %>%
+    ggplot(aes(x = rate)) +
+    geom_histogram(color = "black", fill = "gray", boundary = 0, binwidth = 50) +
+    ylab("Number of States") +
+    xlab("Cases per 100,000") +
+    facet_grid(. ~ year) +
+    scale_x_continuous(breaks = seq(0, 1e5, 2e2)) +
+    ggtitle("Meales Cases Across States")
+```
+
+Next, we create the same plot, applying the square root transformation to the number of cases in each state.
+```{r}
+dat %>% 
+    filter(year %in% c(1950, 1960, 1970), !is.na(rate)) %>%
+    ggplot(aes(x = rate)) +
+    geom_histogram(color = "black", fill = "gray", boundary = 0, binwidth = 3) +
+    ylab("Number of States") +
+    xlab("Cases per 100,000") +
+    facet_grid(. ~ year) +
+    scale_x_sqrt(breaks = seq(0, 50, 6)^2) +
+    ggtitle("Meales Cases Across States (square-root transformed)")
+```
+
+While the difference between 1950/1960 and 1970 are still substantial, the variability of cases across states appears more similar after the square root transformation.
+
+
+4. Plot the Measles disease rates per year for California. Use the the square root transformation. Make sure that the numbers $0,4,16,36, \dots, 100$ appear on the y-axis. Find out when the Measles vaccine was introduced and add a vertical line to the plot to show this year:
+
+**Solution:** 
+```{r}
+dat %>% 
+    filter(state == "California", !is.na(rate)) %>%
+    ggplot(aes(x = year, y = rate)) +
+    geom_line(alpha = 1/2) + 
+    geom_point() + 
+    scale_y_sqrt("Cases per 100,000", breaks = seq(0, 100, 2)^2) + 
+    xlab("Year") +
+    ggtitle("Measles Cases in California") + 
+    geom_vline(xintercept = 1963, col = "blue")
+```
+
+5. Now, this is just California. Does the pattern hold for other states? Use boxplots to get an idea of the distribution of rates for each year, and see if the pattern holds across states.
+
+**Solution:** 
+```{r}
+dat %>% 
+    filter(!is.na(rate)) %>%
+    ggplot(aes(x = factor(year), y = rate)) +
+    geom_boxplot() + 
+    xlab("Year") +
+    scale_y_sqrt("Cases per 100,000", breaks = seq(0, 100, 4)^2) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 1/2)) +
+    ggtitle("Measles Cases per 100,000 by State")
+```
+
+In the plot created in Problem 4, a clear decrease in measles cases is observed in California after the introduction of the vaccine in 1963. The boxplots suggest that a similar pattern holds across states.
+
+
+6. One problem with the boxplot is that it does not let us see state-specific trends. Make a plot showing the trends for all states. Add the US average to the plot. Hint: Note there are missing values in the data.
+
+**Solution:** First, we compute the average across the states.
+```{r}
+avg <- dat %>%
+    filter(weeks_reporting > 0) %>%
+    group_by(year) %>% 
+    summarize(us_rate = sum(count / weeks_reporting) * 52 / sum(population / 100000))
+```
+
+Now, to make the plot we simply use the `geom_line` geometry, and add the 
+```{r}
+dat %>% 
+    filter(!is.na(rate)) %>%
+    ggplot() +
+    geom_line(aes(x = year, y = rate, group = state), color = "grey50", 
+              show.legend = FALSE, alpha = 0.2, size = 1) +
+    geom_line(data = avg, mapping = aes(x = year, y = us_rate), 
+              size = 1, color = "black") +
+    xlab("Year") + 
+    scale_y_sqrt("Cases per 100,000", breaks = seq(0, 100, 4)^2) +
+    ggtitle("Measles Cases per 100,000 by State") + 
+    geom_vline(xintercept=1963, col = "blue") +
+    annotate(geom="text", x=1955, y=150, label="US average", color="black") 
+```
+
+Because there are so many states you should not try to distinguish the states with colors.
+
+7. One problem with the plot above is that we can't distinguish states from each other. There are just too many. We have three variables to show: year, state and rate. If we use the two dimensions to show year and state then we need something other than virtical or horizontal position to show the rates. Try using color. Hint: Use the the geometry `geom_tile` to tile the plot with colors representing disease rates. 
+
+**Solution:** After making the plot below once. We notice that past 1980 counts were often not reported. So we show data up until 1980.
+```{r}
+library(RColorBrewer)
+dat %>% 
+    filter(year <= 1980) %>%
+    ggplot(aes(x = year, y = state,  fill = rate)) +
+    geom_tile(color = "grey50") +
+    scale_x_continuous(expand = c(0,0)) +
+    scale_fill_gradientn("Cases per\n100,000", 
+                         colors = brewer.pal(9, "Reds"), 
+                         trans = "sqrt") +
+    geom_vline(xintercept = 1963, col = "blue") +
+    theme_minimal() +  
+    theme(panel.grid = element_blank()) +
+    ggtitle("Measles Cases per 100,000 by State") + 
+    ylab("") + xlab("")
+```
+
+8. The plots above provide strong evidence showing the benefits of vaccines: as vaccines were introduced, disease rates were reduced. But did autism increase? Find yearly reported autism rates data and provide a plot that shows if it has increased and if the increase coincides with the introduction of vaccines.
+
+**Solution:** A complete response should include: data on yearly autism rates obtained from a (credible) source, the corresponding citation, a plot comparing trends in autism rates, measles rates, and the introduction of the measles vaccine, and finally, a short write-up describing any limitations in the data and conclusions that can be drawn from the analysis.
+
+9. Use data exploration to determine if other diseases (besides Measles) have enough data to explore the effects of vaccines. Prepare a two page report with as many plots as you think are necessary to provide a case for the benefit of vaccines.
+
+**Solution:** A complete response could include (for at least one other disease): at least one plot that displays disease rate over time and the corresponding vaccine introduction date, and a discussion of the benefits of vaccines that refers to the plot(s) generated as supporting evidence. 
