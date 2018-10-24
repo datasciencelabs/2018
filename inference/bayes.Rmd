@@ -143,7 +143,7 @@ The hierarchical model provides a mathematical description of how we came to see
 
 We use a model to represent two levels of variability in our data. First each player is assigned a nature ability to hit at birth. We will use the symbol $p$ to represent this ability. You can think of $p$ as the batting average you would converge to if this particular player batted over and over again. 
 
-Based on the plots above we assume that $p$ has a normal distribution with expected value .270 and standard error 0.027. 
+Based on the plots above we assume that $p$ has a normal distribution with expected value .275 and standard error 0.027. 
 
 Now the second level of variability has to do with luck when batting. Regardless of how good the player is, sometimes you have bad luck and sometimes you have good luck. At each at bat this player has a probability of success $p$. If we add up these success and failures, then the CLT tells us that the observed average, call it $Y$, has a normal distribution with expected value $p$ and standard error $\sqrt{p(1-p)/\sqrt{N}}$ with $N$ the number of at bats.
 
@@ -155,7 +155,7 @@ Y \mid p &\sim N(p, \sigma^2) \mbox{ describes randomness in the performance of 
 \end{aligned}
 $$
 
-with $\mu = .270$, $\tau = 0.027$, and $\sigma^2 = p(1-p)/N$.
+with $\mu = .275$, $\tau = 0.027$, and $\sigma^2 = p(1-p)/N$.
 
 Note the two levels (this is why we call them hierarchical): 1) Player to player variability and 2) variability due to luck when batting. In a Bayesian framework, the first level is called a _prior distribution_ and the second the _sampling distribution_.
 
