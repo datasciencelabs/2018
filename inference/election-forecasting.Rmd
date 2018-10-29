@@ -165,12 +165,6 @@ X_{ij} = d + b + h_i + \varepsilon_{ij}
 $$
 
 and model $b$ as having expected value 0 and, based on historical data, assume the standard error for $b$ is $\sigma_b = 0.025$. 
-
-$$
-X_{ij} = d + b + h_i + \varepsilon_{ij}
-$$
-
-
 Note that the variability of $b$ is not observed because every single poll we observe in 2016 has this general bias.
 
 An implication of adding this term to the model is that the standard deviation for $X_{ij}$ is actually higher than what we earlier called $\sigma$, which combines the pollster variability and the sampling variability, and was estimated with:
