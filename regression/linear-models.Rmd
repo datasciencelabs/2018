@@ -144,7 +144,7 @@ Note that if we further assume that the $\varepsilon$ is normally distributed, t
 
 One reason linear models are popular is that they are interpretable. In the case of Galton's data we can interpret the data like this: due to inherited genes, the son's height prediction grows by $\beta_1$ for each inch we increase the father height $x$. Because not all sons with fathers of height $x$ are of equal height, we need the term $\varepsilon$, which explains the remaining variability. This remaining variability includes the mother's genetic effect, environmental factors, and other biological randomness. 
 
-Note that, given how we wrote the model above, the intercept $\beta_0$ is not very interpretable as it is the predicted height of a son with a father with no height. Due to regression to the mean the prediction will usually be a bit larger than 0. To make the slope parameter more interpretable we can rewrite the model slightly as
+Note that, given how we wrote the model above, the intercept $\beta_0$ is not very interpretable as it is the predicted height of a son with a father with no height. Due to regression to the mean the prediction will usually be a bit larger than 0. To make the intercept parameter more interpretable we can rewrite the model slightly as
 
 $$ 
 Y_i = \beta_0 + \beta_1 (x_i - \bar{x}) + \varepsilon_i, \, i=1,\dots,N 
