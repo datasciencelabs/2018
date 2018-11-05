@@ -76,7 +76,7 @@ dat %>%
 
 These values are closer than the slope we obtained from singles `r signif(singles_slope, 3)`, which is more consistent with our intuition since both singles and BBs get us to first base, they should have about the same predictive power.
 
-Now, although our understanding of the application tells us that HRs cause BBs but not the other way around, we can still check if stratifying by BBs makes the effect of BBs go down. We use the same code except we swap HR and BB to get this plot:
+Now, although our understanding of the application tells us that HRs cause BBs but not the other way around, we can still check if stratifying by BBs makes the effect of HRs go down. We use the same code except we swap HR and BB to get this plot:
 
 ```{r, echo=FALSE}
 dat <- Teams %>% filter(yearID %in% 1961:2001) %>%
