@@ -1,0 +1,216 @@
+---
+title: "Midterm 2 Review Solutions"
+output:
+  html_document: default
+  pdf_document: default
+---
+### Format
+* The midterm will be on Wednesday, November 28th from 9:45-11:15am.
+
+
+* The exam will be through Canvas.
+
+
+* There will be 11 questions. If you answer 10 questions correctly, you will receive 100%. If you answer all 11 questions correctly, you will receive extra credit. 
+
+
+* Each question will be multiple choice, but you will have to write and run code on your laptop in order to answer most questions. You are graded soley on the answer you choose, not the code you write to get the answer.
+
+
+* The use of cell phones is **NOT** permitted during the exam.
+
+
+* You may use lecture notes, homework solutions and the internet during the exam. However, we will be walking around to make sure nobody is messaging each other on Slack, gchat, or any other kind of instant message platform. This is an individual exam and communication with other students is **NOT** permitted.
+
+
+* If you have a question during the exam, raise your hand and a TA or the instructor will walk over to you. **DO NOT ask questions on Slack.**
+
+
+* Please sit in any row except the back row. This will make it easier for the teaching staff to walk around and answer questions.
+
+
+* Due to the time constraint, questions will **not** involve extensive coding or computation time.
+
+### Topics and Concepts
+
+1. Linear regression
+2. Confounding
+3. Sampling
+4. Baseball statistics (familiarity with the data set used in lecture and homework)
+5. Monte Carlo simulations
+6. Data wrangling techniques
+7. CLT
+8. Importing data
+9. Date/time conversion
+10. Joining data frames
+11. Simpson's Paradox
+12. The regression fallacy
+
+### Major functions to review (not an exhaustive list)
+
+* `separate()`
+* `read_csv()`
+* `group_by()`
+* `summarize()`
+* `filter()`
+* `mutate()`
+* `%>%`
+* `replicate()`
+* `rep()`
+* `function(){}`
+* `seq()`
+* `sample()`
+* `c()`
+* `ifelse()`
+* `mean()`
+* `median()`
+* `sd()`
+* `sqrt()`
+* `sum()`
+* `ggplot()`
+* `unite()`
+* `separate()`
+* `gather()`
+* `spread()`
+
+
+### Useful Cheat Sheets
+* `ggplot` [cheatsheet](https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf)
+* `dplyr` and `tidyr` [cheatsheet](https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf)
+* `stringr` and regular expressions [cheatsheet](https://www.rstudio.com/wp-content/uploads/2016/09/RegExCheatsheet.pdf)
+* Other [cheatsheets](https://www.rstudio.com/resources/cheatsheets/)
+
+### Major packages to load (not an exhaustive list)
+
+* `dslabs`
+* `tidyverse`
+* `readr`
+* `tidyr`
+* `dplyr`
+* `ggplot2`
+* `Lahman`
+* `caret`
+* `broom`
+* `lubridate`
+* `stringr`
+* `XML`
+* `gridExtra`
+* `HistData`
+* `reshape2`
+* `lpSolve`
+* `ggrepel`
+* `rvest`
+* `purrr`
+
+### Practice Questions
+
+1. Describe what the `gather()`, `spread()`, `unite()` and `separate()` functions do.
+
+Solution:
+
+* `gather()` converts wide data into tidy data.
+* `spread()` converts tidy data into wide data.
+* `unite()` unites two columns into one; inverse of separate.
+* `separate()` separates multiple variables in a column name into two or more columns; inverse of unite.
+
+
+2. Create the following vector:
+```{r}
+x <- c(15,15,18,19,20,21,21,21,22,22,23,24,24,24,25,25,26,26,27,29,30,31)
+```
+Define a random variable by taking a sample of size 10, with replacement, from `x` and computing the median. Which best approximates the standard error of M? Hint: Use the function replicate to run a Monte Carlo simulation as we have done in class. Set the number of iterations to 10,000.
+
+* **1.5**
+* 0.15
+* 15
+* 5
+
+
+Solution:
+```{r}
+x <- c(15,15,18,19,20,21,21,21,22,22,23,24,24,24,25,25,26,26,27,29,30,31)
+
+sims <- function(x){
+  X <- sample(x, 10, replace = TRUE)
+  median(X)
+}
+
+B <- 10000
+results <- replicate(B, sims(x))
+sd(results)
+```
+
+3. Read the following data set into R:
+```{r, warning = FALSE, message=FALSE}
+library(tidyverse)
+library(readr)
+master <-read_csv("https://raw.githubusercontent.com/datasciencelabs/data/master/Master.csv")
+```
+
+The table includes information about baseball players. Create a player info table that includes
+player ID, first name, last name, birth year and weight. Which of the following best approximates the average weight of players born in or after 1986?
+
+* 218
+* 198
+* **208**
+* 188
+
+Solution:
+```{r}
+player_info <- master %>% select(playerID, nameFirst, nameLast, birthYear, weight) %>%
+               filter(birthYear >= 1986) %>%
+               summarize(avg_weight = mean(weight))
+player_info
+```
+
+4. Read the following data set into R: https://raw.githubusercontent.com/datasciencelabs/data/master/midterm_data.csv
+```{r}
+data <-read_csv("https://raw.githubusercontent.com/datasciencelabs/data/master/ny_airquality.csv")
+```
+
+Split the Date variable into year, month and day. Then compute the average wind speed for each month. What was the average wind speed in September?
+
+* 11.62
+* **10.18**
+* 10.27
+* 8.79
+* 8.94
+
+Solution:
+```{r, warning = FALSE, message=FALSE}
+library(lubridate)
+data <- data %>% mutate(month = month(Date)) %>%
+        group_by(month) %>%
+        summarize(avg = mean(Wind))
+data
+```
+
+5. For this question we will use the following two tables:
+```{r}
+master <- read_csv("https://raw.githubusercontent.com/datasciencelabs/data/master/Master.csv")
+player_info <- master %>% select(playerID, nameFirst, nameLast, birthYear, height)
+salaries <- read_csv("https://raw.githubusercontent.com/datasciencelabs/data/master/Salaries.csv")
+```
+
+Create a table with one row for each player that shows their average salary. Use one of the dplyr join functions to add average salaries to the player_info table.
+Of the players born after 1986, who had the highest average salary?
+
+* Justin Upton
+* Bruce Jay
+* **Masahiro Tanaka**
+* Buster Posey
+
+Solution:
+```{r}
+avg_salary <- salaries %>% group_by(playerID) %>%
+              summarize(avg_salary = mean(salary))
+
+player_info <- left_join(player_info, avg_salary, by = 'playerID')
+
+player_info <- player_info %>% filter(birthYear > 1986) %>%
+               arrange(desc(avg_salary))
+player_info
+```
+
+
+
