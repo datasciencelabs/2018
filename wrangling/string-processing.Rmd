@@ -182,7 +182,7 @@ Finally note that in this table we mention _groups_. These will be explained lat
 
 ### Case Study 1: US murders data
 
-Above we used code to scrape the web and create the `murders_raw` table. We noted that three columns need to be parsed from characters into numbers but that commas where making it difficult. We can use the `str_detect` function to see that four of the nine columns have commas in the entries:
+Above we used code to scrape the web and create the `murders_raw` table. We noted that four (two that we care about) columns need to be parsed from characters into numbers but that commas where making it difficult. We can use the `str_detect` function to see that four of the nine columns have commas in the entries:
 
 ```{r}
 commas <- function(x) any(str_detect(x, ","))
@@ -281,7 +281,7 @@ problematic entries!
 
 We can now view all the cases by simply printing them. We don't do that here becuase there are 292, but after surveying them carefully we see three patterns that are followed by three large groups.
 
-1. A pattern of the form `x'y` or `x' y''` or `x'y\"` with `x` and `y` representing  feet and inches respectively. Here are ten examples:
+1. A pattern of the form `x'y` or `x' y''` or `x'y"` with `x` and `y` representing  feet and inches respectively. Here are ten examples:
 
     ```{r, echo=FALSE}
 pattern <- "^\\d\\s*'\\s*\\d{1,2}\\.*\\d*'*\"*$"
