@@ -321,7 +321,7 @@ To achieve our goal we will use a technique that enables us to accurately detect
 library(stringr)
 ```
 
-A regular expression (regex) is way to describe a specific pattern of characters of text. They can be used to determine if a given string matches the pattern. A set of rules have been defined to do this efficiently and precisely and here we show some examples. We can learn more about these rules by reading a detailed tutorial such as [this one](https://www.regular-expressions.info/tutorial.html) or [this one](http://r4ds.had.co.nz/strings.html#matching-patterns-with-regular-expressions). This [cheat sheet](https://www.rstudio.com/wp-content/uploads/2016/09/RegExCheatsheet.pdf) is also very useful.
+A regular expression (regex) is a way to describe a specific pattern of characters or text. They can be used to determine if a given string matches the pattern. A set of rules have been defined to do this efficiently and precisely and here we show some examples. We can learn more about these rules by reading a detailed tutorial such as [this one](https://www.regular-expressions.info/tutorial.html) or [this one](http://r4ds.had.co.nz/strings.html#matching-patterns-with-regular-expressions). This [cheat sheet](https://www.rstudio.com/wp-content/uploads/2016/09/RegExCheatsheet.pdf) is also very useful.
 
 
 The patterns supplied to the `stringr` functions can be a regex rather than a standard string. We will learn how this works through a series of examples.
@@ -333,7 +333,7 @@ Technically any string is a regex, perhaps the simplest example is a single char
 
 ```{r}
 pattern <- ","
-str_detect(murders_raw$total, pattern) 
+str_detect(murders_raw$murder_total, pattern) 
 ```
 
 is a simple example of searching with regex. 
