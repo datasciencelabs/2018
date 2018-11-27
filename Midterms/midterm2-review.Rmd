@@ -135,7 +135,7 @@ player ID, first name, last name, birth year and weight. Which of the following 
 * 188
 
 
-4. Read the following data set into R: https://raw.githubusercontent.com/datasciencelabs/data/master/midterm_data.csv
+4. Read the following data set into R: https://raw.githubusercontent.com/datasciencelabs/data/master/ny_airquality.csv
 
 Split the Date variable into year, month and day. Then compute the average wind speed for each month. What was the average wind speed in September?
 
