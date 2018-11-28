@@ -1,0 +1,321 @@
+---
+title: "Homework 4: Election Forecasting"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# How reliable is polling data?
+
+Leading up to the 2016 presidential election, many pollsters predicted that the Democratic candidate, Hillary Clinton, would win a ["decisive victory."][wapo] However, as we all know, the election was won by the Republican candidate, and current president, Donald Trump. During class we discussed how general biases, not accounted for by prediction models, often affect many pollsters in the same way. In this homework, you are going to further investigate these biases through comparisons across both national and state-level races. 
+
+The repository for this homework includes an **.RData** file, `election_polls.RData`, containing a `data.frame` (`polls`) with several years worth of polling data (2008, 2010, 2012, 2014 and 2016). The polls cover federal elections for house representatives, senators and the president, and includes polling data from up to a year before the election date. The Presidential election polls were collected from the [RealClearPolitics website][rcp] and the Congressional and Senatorial polls were collected from the [FiveThirtyEight Github repository][thirty]. 
+
+```{r, warning=FALSE, message=FALSE}
+library(tidyverse)
+load("elections_polls.RData")
+```
+
+The `polls` `data.frame` contains the following columns:
+
+- `race`: race identifier year_electiontype_location.
+- `race_state`: race identifier year_electiontype_state. In contrast to the previous column, this identifier ignores information about counties and only contains information at the state level.
+- `state`: abbreviation of state of the election
+- `state_long`: full name of the state
+- `type`: type of race. Could be either presidential (Pres), senatorial election (Sen-G) or house representative election (House-G).
+- `year`: election year
+- `pollster`: name of the pollster
+- `samplesize`: size of the sample used in the poll
+- `startdate`: start date of the pole. If this date was not available, this will be the same as enddate
+- `enddate`: end date of the pole
+- `democrat_name`: name of the democratic candidate
+- `democrat_poll`: percentage of people from the poll saying they would vote for the democratic candidate 
+- `democrat_result`: actual percentage of people voting for the democratic candidate in the election
+- `republican_name`: name of the republican candidate
+- `republican_poll`: percentage of people from the poll saying they would vote for the republican candidate 
+- `republican_result`: actual percentage of people voting for the republican candidate in the election
+
+## Problem 1
+Subset the `polls` `data.frame` to only keep polls which ended within approximately 6 weeks preceding any [Election Day][election-day] (i.e. in October or November). You will be using this smaller data set for the remainder of this homework. Hint: you might need to extract the month from the `enddate`. The `strftime` function might be useful for this.
+
+**Solution**:
+```{r}
+polls <- polls %>% 
+  mutate( endmonth = strftime( polls$enddate, "%m") ) %>%
+  filter( endmonth %in% c("10", "11") )
+```
+
+**Grading:** 6 points 
+
+- 2: correctly extracting month from the `enddate` column (ie `strftime` function call)
+- 2: correctly filtering to october and november
+- 2: correctly creating the smaller data set to be used 
+
+**Other:**
+
+- suggest using `mutate` and `filter` in the same call with repeated use of the pipe
+
+
+## Problem 2
+For each poll, calculate the difference between the fraction of people saying they would vote for the Republican Party and the fraction of people saying they would vote for the Democratic Party. Add these values to your `data.frame` as a new column, `spread`. Similarly, calculate the true (actual) difference between the fraction of people who ended up voting for the Republican Party and the fraction of people who ended up voting for the Democratic Party. Again, add the true (actual) difference as a new column, `spread_act`, to your `data.frame`. 
+
+**Solution**:
+```{r}
+polls <- polls %>%
+  mutate( spread = republican_poll/100 - democrat_poll/100, 
+          spread_act = republican_result/100 - democrat_result/100 ) 
+```
+
+**Grading:** 6 points 
+
+- 2: correctly calculating polling spread (republican/100-democrat/100)
+- 2: correctly calculating actual spread (republican/100-democrat/100)
+- 2: successfully adding these as appended columns (ie `mutate`)
+
+**Other:**
+
+- suggest using a single `mutate` function call creating both variabiles (as done above) instead of multiple mutate calls 
+
+
+## Problem 3
+Now, we are going to collapse polls for each race. For this, we group polls by the type, year, and state of the corresponding election. There are several polls for each race, and each one provides an approximation of the real $\theta$ value. Generate a point estimate for each race, $\hat{\theta}$, that summarizes the polls for that race using the following steps: [1] use the column `race_state` to group polls by type, year, and state, and [2] use the `summarize` function to generate a new `data.frame` called `reduced_polls` with the following columns:
+
+1. the mean `spread`,
+2. the standard deviation of the `spread`,
+3. the mean `spread_act`, and
+4. the number of polls per race. 
+
+Make sure you also keep information about the `year` and `state` of each race in this new `data.frame`.
+
+**Solution**:
+```{r}
+reduced_polls <- polls %>%
+  group_by( race_state ) %>%
+  summarize(avg = mean( spread ), 
+            act = mean( spread_act ),
+            sd = sd( spread ), 
+            year = unique( year ),
+            state = unique( state ),
+            state_long = unique( state_long ),
+            type = unique( type ), 
+            n=n() ) 
+```
+
+**Grading:** 10 points 
+
+- 3: correctly grouping by race_state
+- 1: correctly use `summarise` to create a new data frame called reduced_polls
+- 1: correctly assigning the mean spread
+- 1: correctly assigning the mean spread_act
+- 1: correctly assigning the sd spread
+- 1: correctly assigning the number of polls per year
+- 1: correctly assigning the year
+- 1: correctly assigning the state
+
+**Other:**
+
+- suggest using a single `summarise` function call creating both variabiles (as done above) instead of multiple
+
+
+## Problem 4
+Note that the previous question merges different congressional elections held in the same year across districts in a state. Thus, using the collapsed `data.frame` from the previous question, filter out races from congressional elections. Also, filter out races that had less than 3 polls. For each remaining races, build a 95\% confidence interval for $\hat{\theta}$. Include the boundaries of these confidence intervals in the `reduced_polls` `data.frame`.
+
+**Solution**:
+```{r}
+reduced_polls <- reduced_polls %>%
+  filter( n >= 3, type != "House-G") %>% 
+  mutate( se = sd/sqrt(n) ) %>%
+  mutate(start = avg - 1.96*se, end = avg + 1.96*se) 
+```
+
+**Grading:** 10 points 
+
+- 2: correctly filtering out congressional elections
+- 2: correctly filtering out races with strictly less than 3 polls
+- 2: correctly calculating the se (dividing by `sqrt(n)`)
+- 2: correctly calculating the 95\% CI, using either 1.96 or 2 for the z-score
+- 2: successfully adding these as appended columns to `reduced_polls` 
+
+**Other:**
+
+- suggest using a single `filter` function call to perform the filtering
+- suggest using 1.96 instead of 2 as a better approximation
+
+## Problem 5
+For each election type in each year, calculate the fraction of states where the actual result was **outside** of the 95% confidence interval. Which race was the most unpredictable, (i.e. for which race was the polling data most innacurate compared to the actual result)?
+
+**Solution**:
+```{r}
+reduced_polls %>%
+  mutate( in_range = act > start & act < end ) %>% 
+  group_by(year, type) %>%
+  summarize( elections_in_range = sum( in_range ), 
+             n=n(), 
+             percentage_in_range = sum( in_range )/length(in_range) ) %>%
+  arrange(percentage_in_range)
+```
+The 2012 Senatorial polling data was the most innacurate, followed closely by the 2016 presidential election.
+
+**Grading:** 10 points 
+
+- 3: correctly calculating the states inside (or outside) the CI
+- 3: correctly grouping by year and election type to collapse by state
+- 2: correctly calculating the count and/or percent to summarize 
+- 2: correctly identifying the 2012 senatorial poll as the most unpredictable
+
+**Other:**
+
+- suggest using `arrange` to sort
+- suggest using elections_in_range or percentage_in_range measures to summarize 
+
+## Problem 6
+Using data from *only* the 2016 presidential election, make a plot of states ($x$-axis) and $\hat{\theta}$ estimates ($y$-axis). Using the `gg_errorbar` function, include the 95\% confidence intervals of $\hat{\theta}$ for each state. Finally, using a different color, include the actual results for each state. Describe the resulting plot.
+
+**Solution**:
+```{r}
+reduced_polls %>%
+  filter( type=="Pres", year %in% 2016 ) %>%
+  mutate( state=reorder(state, avg, mean) ) %>%
+  ggplot(aes(state, avg) ) + geom_point() +
+  geom_errorbar(aes(ymin=start, ymax=end), colour="black", width=.8) +
+  geom_point( aes( state, act ), col="red" ) +
+  theme_classic() +
+  theme(axis.text.x=element_text(angle=-90, vjust=0.5)) +
+  ylab("Republican - Democrat") +
+  ggtitle("2016 Presidential Election Polling (black) vs Outcome (red)") +
+  geom_hline(yintercept=0, linetype="dashed", color="grey")
+```
+
+It is clear that most state-level results fall outside the 95% confidence interval, and in the Republican direction. 
+
+**Grading:** 15 points 
+
+- 2: correctly filtering to presidential election and 2016
+- 4: correctly creating the plot with appropriate axes
+- 2: correctly utilizing `gg_errorbar` to show CI
+- 2: correctly displaying the actual results as a different color
+- 2: overall plot appearance (remove points for bad labels, colors, or titles)
+- 3: Plot description (full sentences and sufficient description)
+
+**Other:**
+
+- suggest using `reorder` to make the plot prettier
+- suggest more informative axis labelling and titles
+
+## Problem 7
+Which states did Donald Trump win in the 2016 presidential election, despite the entire 95\% confidence intervals being in favor of his opponent, Hillary Clinton?
+
+**Solution**:
+```{r}
+reduced_polls %>%
+  filter( year==2016 & type == "Pres" & end < 0 & act > 0 ) %>%
+  select( state_long )
+```
+Donald Trump won Florida, Michigan, North Carolina, Pennsylvania, and Wisconsin, despite the entire 95% confidence intervals from polling data predicting a win for Hillary Clinton.
+
+**Grading:** 8 points 
+
+- 2: correctly filtering out to 2016
+- 2: correctly filtering out to the presidential election
+- 2: correctly filtering to the confidence interval
+- 2: correctly identifying the states
+
+**Other:**
+
+- suggest using a single `filter` function call to perform the filtering
+- suggest using the `select` function to show the states
+
+## Problem 8
+Looking again at all races, calculate the the difference between $\theta$ and $\hat{\theta}$ (Hint: use the data for all races in the `reduced_polls` object created in Problem 4). We call this the bias term. Add these values as a column to `reduced_polls`.
+
+**Solution**:
+```{r}
+reduced_polls <- reduced_polls %>%
+  mutate( bias = act - avg )
+```
+
+**Grading:** 5 points 
+
+- 3: correctly calculating the bias 
+- 2: correctly adding this column to `reduced_polls`
+
+## Problem 9
+Plot and compare the distribution of bias terms for races in each year. Describe the bias patterns. Are these centered around zero? Give possible explanations. 
+
+**Solution**:
+```{r}
+reduced_polls %>%
+  ggplot( aes( as.factor(year), bias, fill=type) ) +
+  geom_hline(yintercept=0, linetype="dashed", color="grey") +
+  geom_boxplot( ) + 
+  xlab("Electoral year") +
+  ylab("Bias (in Republican - Democrat difference)") +
+  theme_classic() 
+```
+
+**Grading:** 12 points 
+
+- 6: correctly creating a plot(s) with appropriate axes (`as.factor` for year, can show histograms but we encourage box-plots here)
+- 3: overall plot appearance and strategy (remove points for bad labels, colors, or titles)
+- 3: Plot description (full sentences and sufficient description)
+
+**Other:**
+
+- suggest using `reorder` to make the plot prettier
+- suggest boxplots if they weren't used
+- suggest a zero line
+- suggest faceting if they show multiple plots
+
+## Problem 10
+Using the [__fiftystater__](https://cran.r-project.org/web/packages/fiftystater/index.html) package, create a plot for each of the last three presidential elections showing the bias estimates for each state on a map of the United States. Describe any patterns or differences between the three elections.
+
+**Solution**:
+```{r}
+library(fiftystater)
+library(RColorBrewer)
+
+data("fifty_states")
+
+plotBiasForYear <- function(yr){
+  per_state_bias <- reduced_polls %>%
+    filter( type=="Pres", year==yr ) %>%
+    select( state_long, bias )
+  ggplot(per_state_bias, aes(map_id = state_long)) + 
+    geom_map(aes(fill = bias), map = fifty_states) + 
+    expand_limits(x = fifty_states$long, y = fifty_states$lat) +
+    coord_map() +
+    scale_x_continuous(breaks = NULL) + 
+    scale_y_continuous(breaks = NULL) +
+    labs(x = "", y = "") +
+    theme(legend.position = "bottom", 
+        panel.background = element_blank()) +
+    scale_fill_gradientn(colors=rev(colorRampPalette(brewer.pal(9, "RdBu"))(3)),
+        breaks = seq(-0.2, 0.2, length.out=3), 
+        limits=c(-.2,.2),
+        labels=round(seq(-0.2, 0.2, length.out=3), 2))
+}
+
+plotBiasForYear(2016)
+plotBiasForYear(2012)
+plotBiasForYear(2008)
+```
+
+**Grading:** 18 points 
+
+- 2: loading the fifty_states data and packages
+- 3: correctly filtering to presidential biases and year-level
+- 4: correctly mapping this with the `geom_map` function
+- 3: overall plot appearance (remove points for bad labels, colors, or titles, lack of legend)
+- 3: including each of the last 3 elections
+- 3: sufficient plot descriptions addressing the state-level patterns (full sentences and sufficient description)
+
+**Other:**
+ - suggest better map coloring
+ - suggest using a function to plot these (as above)
+
+[wapo]:https://www.washingtonpost.com/news/monkey-cage/wp/2016/11/08/a-comprehensive-average-of-election-forecasts-points-to-a-decisive-clinton-victory/
+[election-day]:https://en.wikipedia.org/wiki/Election_Day_(United_States)
+[rcp]: https://www.realclearpolitics.com/
+[thirty]: https://github.com/fivethirtyeight/data
