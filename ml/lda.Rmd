@@ -126,13 +126,13 @@ Quadratic Discriminant Analysis (QDA) relates to the _Naive Bayes_ approach we d
 $\mbox{Pr}(Y=1|X=x)$ using Bayes theorem. 
 
 $$
-f(x) = \mbox{Pr}(Y=1|\mathbf{X}=\mathbf{x}) = \frac{\pi p_{\mathbf{X}|Y=1}(x)}
-{(1-\pi) p_{\mathbf{X}|Y=0}(x) + \pi p_{\mathbf{X}|Y=1}(x)}
+p(x) = \mbox{Pr}(Y=1|\mathbf{X}=\mathbf{x}) = \frac{\pi f_{\mathbf{X}|Y=1}(x)}
+{(1-\pi) f_{\mathbf{X}|Y=0}(x) + \pi f_{\mathbf{X}|Y=1}(x)}
 $$
 
-With QDA we assume that the distributions $p_{\mathbf{X}|Y=1}(x)$ and $p_{\mathbf{X}|Y=0}(x)$ are multivariate normal. In our case we have two predictors so we assume each one is bivariate normal. This implies we need to estimate two averages, two standard deviations, and a correlation for each case: $Y=1$ and $Y=0$. 
+With QDA we assume that the distributions $f_{\mathbf{X}|Y=1}(x)$ and $f_{\mathbf{X}|Y=0}(x)$ are multivariate normal. In our case we have two predictors so we assume each one is bivariate normal. This implies we need to estimate two averages, two standard deviations, and a correlation for each case: $Y=1$ and $Y=0$. 
 
-This implies that we can approximate the distributions $p_{X_1,X_2|Y=1}$ and $p_{X_1, X_2|Y=0}$. We can easily estimate parameters from the data:
+This implies that we can approximate the distributions $f_{X_1,X_2|Y=1}$ and $f_{X_1, X_2|Y=0}$. We can easily estimate parameters from the data:
 
 ```{r}
 options(digits = 2)
@@ -213,22 +213,6 @@ p <- true_f %>% mutate(f=f_hat_lda) %>%
 
 grid.arrange(true_f_plot, p, nrow=1)
 ```
-
-
-### Connection distance
-
-The normal density is
-
-$$
-p(x) = \frac{1}{\sqrt{2\pi} \sigma} \exp\left\{ - \frac{(x-\mu)^2}{\sigma^2}\right\}$$
-
-Note if we remove the constant $1/(\sqrt{2\pi} \sigma)$ and then take the log we get:
-
-$$
-- \frac{(x-\mu)^2}{\sigma^2}
-$$
-
-which is the negative of a distance squared scaled by the variance. For higher dimensions the same is true except the scaling is more complex and involves correlations.
 
 ## ROC
 
