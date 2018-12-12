@@ -141,10 +141,10 @@ gc()
 
 ### Loss function 
 
-The performance statistic used in the Netflix challenge was the residual mean squared error (RMSE). This is related to the MSE error function we described earlier. If \hat{Y} is our prediction and $Y$ is the observed rating, then we prefer recommendation systems that minimize:
+The performance statistic used in the Netflix challenge was the residual mean squared error (RMSE). This is related to the MSE error function we described earlier. If $\hat{Y}$ is our prediction and $Y$ is the observed rating, then we prefer recommendation systems that minimize:
 
 $$
-\mbox{E}\{(\hat{Y} - Y)^2\}
+mbox{E}\{(\hat{Y} - Y)^2\}
 $$
 
 In practice we look at the empirical version of this, which is the RMSE:
